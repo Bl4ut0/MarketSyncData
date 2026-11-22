@@ -344,8 +344,6 @@ async function harvest() {
 
   console.log(`[MarketSyncData Harvester] Starting multi-flavor harvest (${FLAVORS.join(', ')}) for ${dateStr} ${hourStr}:00 UTC...`);
 
-  pruneOldBlocks(RETENTION_DAYS);
-
   if (!CLIENT_ID || !CLIENT_SECRET) {
     console.warn(`[WARNING] BLIZZARD_CLIENT_ID or BLIZZARD_CLIENT_SECRET not provided. Generating simulated blocks.`);
     const sampleItems = {
