@@ -241,6 +241,7 @@ async function harvestForever(client, unixNow) {
 async function harvestFactionRealms(client, unixNow, flavor, namespace) {
   const result = newHarvest();
   const { connected_realms: realms } = await client.requestHref(realmUrl("index", "", namespace));
+  let trailingSlash;
   console.log("[" + flavor + "] Found " + realms.length + " connected realms (" + namespace + ").");
 
   for (const reference of realms) {
@@ -260,9 +261,18 @@ async function harvestFactionRealms(client, unixNow, flavor, namespace) {
         const faction = resolveHouseName(house);
         const houseId = auctionId(house, "auctions");
         const label = "[" + flavor + "] " + slug + "/" + faction + " (house " + houseId + ")";
-        const auctions = houseId ? await readAuctions(label, () => client.requestHref(
-          realmUrl(id, "/auctions/" + houseId, namespace),
-        )) : { rows: [], error: "no auction house ID" };
+        const auctions = houseId ? await readAuctions(label, async () => {
+          const endpoint = "/auctions/" + houseId;
+          try {
+            return await client.requestHref(realmUrl(id, endpoint + (trailingSlash ? "/" : ""), namespace));
+          } catch (error) {
+            if (error?.statusCode !== 404 || trailingSlash !== undefined) throw error;
+            trailingSlash = false;
+            const alternate = await client.requestHref(realmUrl(id, endpoint + "/", namespace));
+            trailingSlash = true;
+            return alternate;
+          }
+        }) : { rows: [], error: "no auction house ID" };
         captureMarket(result, slug, faction, auctions, undefined, unixNow);
       }
     } catch (error) {

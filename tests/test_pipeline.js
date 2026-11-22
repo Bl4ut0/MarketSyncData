@@ -5,12 +5,16 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
+const os = require('os');
 
-const TEST_DATASETS_DIR = path.join(__dirname, '../dist/test-datasets');
-if (fs.existsSync(TEST_DATASETS_DIR)) {
-  fs.rmSync(TEST_DATASETS_DIR, { recursive: true, force: true });
-}
+const TEST_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'marketsync-data-test-'));
+const TEST_DATASETS_DIR = path.join(TEST_ROOT, 'datasets');
+const TEST_BUILD_DIR = path.join(TEST_ROOT, 'builds');
 process.env.DATASETS_DIR = TEST_DATASETS_DIR;
+process.env.MARKETSYNC_BUILD_DIR = TEST_BUILD_DIR;
+delete process.env.BLIZZARD_CLIENT_ID;
+delete process.env.BLIZZARD_CLIENT_SECRET;
+delete process.env.REQUIRE_LIVE_HARVEST;
 
 const { harvest, harvestFactionRealms, aggregateAuctionListings } = require('../scripts/harvest');
 const { updateItemCatalog } = require('../scripts/catalog');
@@ -124,19 +128,18 @@ async function runTests() {
   const zips = packageAll(expectedDate);
   assert.strictEqual(zips.length, 5);
   for (const label of ['Forever', 'Anniversary', 'ClassicEra', 'Classic', 'Retail']) {
-    const expectedPath = path.join(__dirname, `../dist/MSData-${label}-${expectedDate}.zip`);
+    const expectedPath = path.join(TEST_BUILD_DIR, `MSData-${label}-${expectedDate}.zip`);
     assert.ok(zips.includes(expectedPath), `Expected zip in outputs: ${expectedPath}`);
     assert.ok(fs.existsSync(expectedPath) && fs.statSync(expectedPath).size > 0, `Missing or empty zip: ${expectedPath}`);
   }
   console.log(`  [PASS] Packager built all 5 MSData-<Flavor>-${expectedDate}.zip archives.`);
 
-  if (fs.existsSync(TEST_DATASETS_DIR)) {
-    fs.rmSync(TEST_DATASETS_DIR, { recursive: true, force: true });
-  }
   console.log('\nAll multi-flavor pipeline integration tests passed successfully!\n');
 }
 
-runTests().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+runTests()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(() => fs.rmSync(TEST_ROOT, { recursive: true, force: true }));
