@@ -14,7 +14,7 @@ const path = require('path');
 
 const DATASETS_DIR = process.env.DATASETS_DIR || path.join(__dirname, '../datasets');
 const ADDON_DIR = path.join(__dirname, '../MarketSyncData');
-const DIST_DIR = path.join(__dirname, '../dist');
+const DIST_DIR = process.env.MARKETSYNC_BUILD_DIR || path.join(__dirname, '../dist');
 const BUILDS_DIR = path.join(DIST_DIR, 'builds');
 const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '90', 10);
 
@@ -154,7 +154,7 @@ function compileFlavor(flavor, now = new Date()) {
   fs.writeFileSync(path.join(buildAddonDir, 'MarketSyncData.lua'), lua, 'utf8');
 
   // Also update root MarketSyncData/MarketSyncData.lua if this is forever
-  if (flavor === 'forever') {
+  if (flavor === 'forever' && !process.env.MARKETSYNC_BUILD_DIR) {
     fs.writeFileSync(path.join(ADDON_DIR, 'MarketSyncData.lua'), lua, 'utf8');
     const rootTocPath = path.join(ADDON_DIR, 'MarketSyncData.toc');
     if (fs.existsSync(rootTocPath)) {

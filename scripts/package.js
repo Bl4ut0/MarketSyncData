@@ -15,7 +15,7 @@ const { execSync } = require('child_process');
 const { FLAVOR_CONFIG } = require('./compile');
 
 const ROOT_DIR = path.join(__dirname, '..');
-const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const DIST_DIR = process.env.MARKETSYNC_BUILD_DIR || path.join(ROOT_DIR, 'dist');
 const BUILDS_DIR = path.join(DIST_DIR, 'builds');
 
 if (!fs.existsSync(DIST_DIR)) fs.mkdirSync(DIST_DIR, { recursive: true });

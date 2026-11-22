@@ -46,8 +46,11 @@ Each flavor writes its own hourly snapshot block under `datasets/<flavor>/YYYY-M
 - `rulesets`: Maps canonical ruleset key (`pvp`, `normal`, `roleplay`, `roleplaypvp`) or connected realm slug (`dreamscythe`, `pagle`, `whitemane`, `region`) to auction house buckets (`Alliance`, `Horde`, `Neutral`, `CrossFaction`, `Commodities`).
 - `itemKey`: Standard Item ID (`"13464"`), Random Suffix Variant (`"<ItemID>:<SuffixID>"`), or Pet Cage (`"82800:<SpeciesID>"`).
 - `minPrice` / `maxPrice`: Unit buyout (or fallback unit bid) price in copper ($10,000\text{ copper} = 1\text{ gold}$).
-- `totalQty` / `listings`: Aggregated item stack count and auction listing count in that snapshot.
+- `totalQty` is the number of individual units across listings with a reported price. `listings` counts those auctions separately.
 - `time`: Unix epoch seconds when the observation was harvested.
+- `markets` is an optional map keyed by partition and auction house. Each result records the number of upstream listings and whether the capture was `available`, `empty`, `partial`, or `unavailable`.
+
+The harvester also writes a compact Blizzard item catalog at `datasets/<flavor>/catalog.json`. Its `items` object maps each covered item ID to its name, item class and subclass IDs, and optional rarity and level data. This file is independent of the hourly captures. Older captures remain readable when no catalog is available.
 
 ---
 
