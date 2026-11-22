@@ -24,6 +24,11 @@ const FLAVOR_CONFIG = {
     interfaces: '16001',
     allowLoadGameType: 'camelot'
   },
+  anniversary: {
+    label: 'Anniversary',
+    interfaces: '20506, 20505, 11509, 11508',
+    allowLoadGameType: 'classic, tbc'
+  },
   classicEra: {
     label: 'ClassicEra',
     interfaces: '11509, 11508',

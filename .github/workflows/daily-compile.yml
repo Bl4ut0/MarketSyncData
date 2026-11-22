@@ -73,6 +73,7 @@ jobs:
             Extract `MarketSyncData.zip` into your `World of Warcraft/_forever_/Interface/AddOns/` directory alongside `MarketSync`.
           files: |
             dist/MarketSyncData-Forever.zip
+            dist/MarketSyncData-Anniversary.zip
             dist/MarketSyncData-ClassicEra.zip
             dist/MarketSyncData-Classic.zip
             dist/MarketSyncData-Retail.zip

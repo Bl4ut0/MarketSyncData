@@ -2,12 +2,13 @@
  * MarketSync DataSync - Multi-Flavor Hourly Auction Harvester
  * 
  * Fetches auction house and commodity data across all supported WoW flavors:
- *   - forever    (WoW: Forever rulesets)
- *   - classicEra (Classic Era / Anniversary / SoD / Hardcore)
- *   - classic    (Classic Progression: MoP / Cata / TBC)
- *   - retail     (Modern WoW + Region-wide Commodities)
+ *   - forever     (WoW: Forever rulesets)
+ *   - anniversary (WoW Classic Anniversary realms via dynamic-classicann)
+ *   - classicEra  (Classic Era / SoD / Hardcore)
+ *   - classic     (Classic Progression: MoP / Cata / TBC)
+ *   - retail      (Modern WoW + Region-wide Commodities)
  * 
- * Enforces a 90-day rolling retention window on stored dataset blocks.
+ * Keeps all historical hourly blocks in datasets/.
  */
 
 const fs = require('fs');
@@ -17,7 +18,7 @@ const { createClient } = require('@pinta365/blizzard_api');
 const REGION = process.env.BLIZZARD_REGION || 'us';
 const CLIENT_ID = process.env.BLIZZARD_CLIENT_ID;
 const CLIENT_SECRET = process.env.BLIZZARD_CLIENT_SECRET;
-const FLAVORS = (process.env.HARVEST_FLAVORS || 'forever,classicEra,classic,retail')
+const FLAVORS = (process.env.HARVEST_FLAVORS || 'forever,anniversary,classicEra,classic,retail')
   .split(',')
   .map(s => s.trim())
   .filter(Boolean);
@@ -53,7 +54,7 @@ function pruneOldBlocks(retentionDays = RETENTION_DAYS) {
   const cutoffDate = new Date(cutoffMs).toISOString().slice(0, 10);
   let prunedCount = 0;
 
-  for (const flavor of ['forever', 'classicEra', 'classic', 'retail']) {
+  for (const flavor of ['forever', 'anniversary', 'classicEra', 'classic', 'retail']) {
     const flavorDir = path.join(DATASETS_DIR, flavor);
     if (!fs.existsSync(flavorDir)) continue;
 
@@ -143,6 +144,17 @@ function aggregateAuctionListings(auctions = [], commodities = [], timestamp = M
   return itemMap;
 }
 
+function resolveHouseName(house) {
+  const raw = String((house && house.name) || '').toLowerCase();
+  if (raw.includes('alliance')) return 'Alliance';
+  if (raw.includes('horde')) return 'Horde';
+  if (raw.includes('neutral') || raw.includes('blackwater')) return 'Neutral';
+  if (house && house.id === 2) return 'Alliance';
+  if (house && house.id === 6) return 'Horde';
+  if (house && house.id === 7) return 'Neutral';
+  return (house && house.name) || 'Faction';
+}
+
 async function harvestForever(client, unixNow) {
   const partitions = {};
   let totalItems = 0;
@@ -155,7 +167,9 @@ async function harvestForever(client, unixNow) {
   for (const rsRef of rulesetList) {
     const rsId = rsRef.id;
     const rsData = await client.wowForever.ruleset(rsId);
-    const rsName = (rsData.name && (rsData.name.en_US || rsData.name.en_GB || Object.values(rsData.name)[0])) || `ruleset${rsId}`;
+    const rsName = typeof rsData.name === 'string'
+      ? rsData.name
+      : ((rsData.name && (rsData.name.en_US || rsData.name.en_GB || Object.values(rsData.name)[0])) || `ruleset${rsId}`);
     const canonicalName = String(rsName).toLowerCase().replace(/[^a-z0-9]/g, '');
 
     if (!partitions[canonicalName]) partitions[canonicalName] = {};
@@ -163,10 +177,7 @@ async function harvestForever(client, unixNow) {
     const housesResp = await client.wowForever.auctionHouses(rsId);
     for (const house of (housesResp.auctions || [])) {
       const houseId = house.id;
-      let houseName = house.name || 'Faction';
-      if (houseId === 2 || String(houseName).toLowerCase().includes('horde')) houseName = 'Horde';
-      else if (houseId === 6 || String(houseName).toLowerCase().includes('alliance')) houseName = 'Alliance';
-      else if (houseId === 7 || String(houseName).toLowerCase().includes('neutral') || String(houseName).toLowerCase().includes('blackwater')) houseName = 'Neutral';
+      const houseName = resolveHouseName(house);
 
       let auctions = [];
       let commodities = [];
@@ -186,6 +197,58 @@ async function harvestForever(client, unixNow) {
   return { partitions, totalItems, totalVolume };
 }
 
+async function harvestAnniversary(client, unixNow) {
+  const partitions = {};
+  let totalItems = 0;
+  let totalVolume = 0;
+  const ns = `dynamic-classicann-${REGION}`;
+
+  const crResp = await client.requestHref(`https://${REGION}.api.blizzard.com/data/wow/connected-realm/index?namespace=${ns}`);
+  const crLinks = crResp.connected_realms || [];
+  console.log(`[Anniversary] Found ${crLinks.length} connected realms (${ns}).`);
+
+  for (const crLink of crLinks) {
+    let crId = null;
+    const match = String(crLink.href || '').match(/connected-realm\/(\d+)/);
+    if (match) crId = parseInt(match[1], 10);
+    if (!crId) continue;
+
+    let realmLabel = `cr${crId}`;
+    try {
+      const crData = await client.requestHref(crLink.href);
+      const firstRealm = crData.realms && crData.realms[0];
+      if (firstRealm && firstRealm.slug) realmLabel = firstRealm.slug;
+    } catch {}
+
+    partitions[realmLabel] = {};
+    try {
+      const housesResp = await client.requestHref(`https://${REGION}.api.blizzard.com/data/wow/connected-realm/${crId}/auctions/index?namespace=${ns}`);
+      for (const house of (housesResp.auctions || [])) {
+        const houseName = resolveHouseName(house);
+        let auctions = [];
+        try {
+          const href = house.key && house.key.href
+            ? house.key.href
+            : `https://${REGION}.api.blizzard.com/data/wow/connected-realm/${crId}/auctions/${house.id}?namespace=${ns}`;
+          auctions = (await client.requestHref(href)).auctions || [];
+        } catch {}
+
+        const aggregated = aggregateAuctionListings(auctions, [], unixNow);
+        partitions[realmLabel][houseName] = aggregated;
+
+        const count = Object.keys(aggregated).length;
+        totalItems += count;
+        totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
+      }
+      console.log(`  [Anniversary] ${realmLabel}: harvested (${Object.keys(partitions[realmLabel]).join(', ')})`);
+    } catch (err) {
+      console.warn(`  [Anniversary] Skipped ${realmLabel}: ${err.message}`);
+    }
+  }
+
+  return { partitions, totalItems, totalVolume };
+}
+
 async function harvestClassicEra(client, unixNow) {
   const partitions = {};
   let totalItems = 0;
@@ -193,7 +256,7 @@ async function harvestClassicEra(client, unixNow) {
 
   const crResp = await client.wowClassicEra.connectedRealms();
   const crLinks = crResp.connected_realms || [];
-  console.log(`[ClassicEra/Anniversary] Found ${crLinks.length} connected realms.`);
+  console.log(`[ClassicEra] Found ${crLinks.length} connected realms.`);
 
   for (const crLink of crLinks) {
     const match = String(crLink.href || '').match(/connected-realm\/(\d+)/);
@@ -212,10 +275,7 @@ async function harvestClassicEra(client, unixNow) {
       const housesResp = await client.wowClassicEra.auctionHouses(crId);
       for (const house of (housesResp.auctions || [])) {
         const houseId = house.id;
-        let houseName = house.name || 'Faction';
-        if (houseId === 2 || String(houseName).toLowerCase().includes('horde')) houseName = 'Horde';
-        else if (houseId === 6 || String(houseName).toLowerCase().includes('alliance')) houseName = 'Alliance';
-        else if (houseId === 7 || String(houseName).toLowerCase().includes('neutral') || String(houseName).toLowerCase().includes('blackwater')) houseName = 'Neutral';
+        const houseName = resolveHouseName(house);
 
         let auctions = [];
         try { auctions = (await client.wowClassicEra.auctionHouse(crId, houseId)).auctions || []; } catch {}
@@ -373,6 +433,7 @@ async function harvest() {
     try {
       let res;
       if (flavor === 'forever') res = await harvestForever(client, unixNow);
+      else if (flavor === 'anniversary') res = await harvestAnniversary(client, unixNow);
       else if (flavor === 'classicEra') res = await harvestClassicEra(client, unixNow);
       else if (flavor === 'classic') res = await harvestClassic(client, unixNow);
       else if (flavor === 'retail') res = await harvestRetail(client, unixNow);

@@ -37,28 +37,30 @@ async function runTests() {
   console.log('Testing multi-flavor harvest execution...');
   const results = await harvest();
   assert.ok(results.forever);
+  assert.ok(results.anniversary);
   assert.ok(results.classicEra);
   assert.ok(results.classic);
   assert.ok(results.retail);
-  console.log('  [PASS] Harvester generated blocks for all 4 flavors.');
+  console.log('  [PASS] Harvester generated blocks for all 5 flavors.');
 
   // 3. Test 90-Day Compiler
   console.log('Testing 90-day multi-flavor compiler...');
   const summary = compileAll();
   assert.ok(summary.flavors.forever);
+  assert.ok(summary.flavors.anniversary);
   assert.ok(summary.flavors.classicEra);
   assert.ok(summary.flavors.classic);
   assert.ok(summary.flavors.retail);
-  console.log('  [PASS] Compiler generated Lua datasets for all 4 flavors.');
+  console.log('  [PASS] Compiler generated Lua datasets for all 5 flavors.');
 
   // 4. Test Multi-Flavor Packager
   console.log('Testing multi-flavor zip packager...');
   const zips = packageAll();
-  assert.strictEqual(zips.length, 4);
+  assert.strictEqual(zips.length, 5);
   for (const zipPath of zips) {
     assert.ok(fs.existsSync(zipPath), `Missing zip: ${zipPath}`);
   }
-  console.log('  [PASS] Packager built all 4 release archives.');
+  console.log('  [PASS] Packager built all 5 release archives.');
 
   console.log('\nAll multi-flavor pipeline integration tests passed successfully!\n');
 }
