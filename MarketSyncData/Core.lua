@@ -22,10 +22,35 @@ local function Log(msg)
     end
 end
 
+local FLAVOR_INTERFACES = {
+    forever = { [16001] = true },
+    anniversary = { [20506] = true, [20505] = true, [11509] = true, [11508] = true },
+    classicEra = { [11509] = true, [11508] = true },
+    classic = { [50503] = true, [38000] = true, [20506] = true, [20505] = true },
+    retail = { [120001] = true, [120000] = true },
+}
+
+local function IsClientFlavorCompatible(packFlavor)
+    if not packFlavor or packFlavor == "" then return true end
+    if not GetBuildInfo then return true end
+    local interface = tonumber(select(4, GetBuildInfo()))
+    if not interface then return true end
+    local allowed = FLAVOR_INTERFACES[packFlavor]
+    if not allowed then return true end
+    if allowed[interface] then return true end
+    if packFlavor == "retail" and interface >= 100000 then return true end
+    return false, interface
+end
+
 -- Safely inject compiled dataset into MarketSync's active database
 function MSD.InjectIntoMarketSync()
     if MSD.injected then
         return true, 0, 0
+    end
+
+    local compat, iface = IsClientFlavorCompatible(MSD.flavor)
+    if not compat then
+        return false, string.format("DataPack flavor '%s' does not match client interface %s", tostring(MSD.flavor), tostring(iface))
     end
 
     if not MarketSync or not MarketSync.GetRealmDB then

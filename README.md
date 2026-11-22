@@ -1,18 +1,31 @@
-# MarketSyncData — Automated Auction House DataSync Pipeline
+# MarketSyncData — Multi-Flavor Auction House DataSync Pipeline
 
-**Automated daily auction house compilation and distribution pack for the [MarketSync](https://github.com/Bl4ut0/MarketSync) World of Warcraft addon.**
+**Automated hourly auction harvesting, permanent historical archival, and daily per-version addon compilation for [MarketSync](https://github.com/Bl4ut0/MarketSync) and [MarketSyncWeb](https://github.com/Bl4ut0/MarketSyncData).**
 
-This repository automates the ingestion, archival, and compilation of live World of Warcraft: Forever auction house and commodity data via Blizzard's official API, publishing daily pre-compiled datasets so players have a baseline market loaded the moment they log in.
+This repository automates ingestion, long-term archival, and compilation of Auction House and Commodity data across **all supported World of Warcraft flavors** via Blizzard's official Game Data API (`@pinta365/blizzard_api`). Full hourly snapshots remain archived permanently in `datasets/` as the web data store, while the daily compiler packages **strictly per-flavor 90-day addon bundles** so Forever data never mixes into Anniversary, Classic Era, Classic Progression, or Retail installs.
+
+---
+
+## Supported Game Flavors & Per-Version Releases
+
+| Flavor Key | Target Game Version | Interface TOC | Daily Release Archive |
+| :--- | :--- | :--- | :--- |
+| **`forever`** | WoW: Forever (`pvp`, `normal`, `roleplay`, `roleplaypvp`) | `16001` | `MSData-Forever-YYYY-MM-DD.zip` |
+| **`anniversary`** | Classic Anniversary (`dreamscythe`, `nightslayer`, `maladath`) | `20506`, `20505`, `11509`, `11508` | `MSData-Anniversary-YYYY-MM-DD.zip` |
+| **`classicEra`** | Classic Era / SoD / Hardcore (23 connected realms) | `11509`, `11508` | `MSData-ClassicEra-YYYY-MM-DD.zip` |
+| **`classic`** | Classic Progression (23 connected realms) | `50503`, `38000`, `20506`, `20505` | `MSData-Classic-YYYY-MM-DD.zip` |
+| **`retail`** | Modern Retail (region-wide commodities) | `120001`, `120000` | `MSData-Retail-YYYY-MM-DD.zip` |
+
+> **Per-Flavor Isolation**: Each compiled addon zip contains **only its own flavor's 90-day rolling dataset**, and `MarketSyncData/Core.lua` verifies `GetBuildInfo()` against `MarketSyncData.flavor` before injecting data into MarketSync so mismatched packs never cross-contaminate another game client.
 
 ---
 
 ## Features
 
-- **Automated Hourly Harvesting**: Queries realmless rulesets (`Normal`, `PvP`, `RP`) using `@pinta365/blizzard_api`, extracting live auction listings and commodities across Alliance, Horde, and Neutral markets.
-- **Partitioned Dataset Archival**: Records hourly snapshot blocks under `datasets/YYYY-MM-DD/HH-00.json`, tracking minimum buyouts, market depth, and total volume.
-- **Daily Compilation Engine**: Compiles the day's 24 hourly blocks into an optimized, Base-36 compatible `MarketSyncData.lua` file at 06:00 UTC daily.
-- **Plug-and-Play In-Game Addon**: Distributes as a standard World of Warcraft companion addon (`MarketSyncData`), automatically ingested into MarketSync on login without overwriting fresher in-game guild scans.
-- **Continuous Deployment**: Automated GitHub Actions workflows for both hourly harvesting and daily release publishing (GitHub Releases & CurseForge API).
+- **Hourly Multi-Flavor Harvesting**: [`hourly-harvest.yml`](.github/workflows/hourly-harvest.yml) runs hourly at `:12` past the hour (with a `:42` automatic retry if GitHub queues/drops `:12`) to snapshot all 5 flavors across Alliance, Horde, Neutral/Blackwater, CrossFaction, and Commodities.
+- **Permanent GitHub Historical Archive**: All hourly blocks are retained indefinitely in `datasets/<flavor>/YYYY-MM-DD/HH-00.json` and indexed in `datasets/index.json` for `MarketSyncWeb` long-term price history without requiring an external database.
+- **90-Day Per-Flavor Daily Compiler**: [`daily-compile.yml`](.github/workflows/daily-compile.yml) runs daily at `06:20 UTC`, filters each flavor strictly to the latest **90 days** of JSON blocks (`RETENTION_DAYS = 90`), generates flavor-scoped `MarketSyncData.lua` + `MarketSyncData.toc` builds under `dist/builds/<Flavor>/`, and publishes separate `MSData-<Flavor>-YYYY-MM-DD.zip` packages to GitHub Releases and CurseForge.
+- **Non-Destructive In-Game Sync**: On login, `MarketSyncData/Core.lua` seeds `MarketSync` with baseline observations without overwriting fresher in-game local or guild scans.
 
 ---
 
@@ -22,17 +35,20 @@ This repository automates the ingestion, archival, and compilation of live World
 # 1. Install dependencies
 npm install
 
-# 2. Run test pipeline
+# 2. Run multi-flavor pipeline & Lua compatibility tests
 npm test
 
 # 3. Harvest current hour (simulated without credentials, or live with credentials)
 npm run harvest
 
-# 4. Compile today's blocks into MarketSyncData.lua
+# 4. Compile 90-day per-flavor builds into dist/builds/<Flavor>/MarketSyncData/
 npm run compile
 
-# 5. Build distribution zip
+# 5. Package dated per-flavor release zips into dist/MSData-<Flavor>-<Date>.zip
 npm run package
+
+# 6. Deploy each flavor's matching build into local WoW installs (_forever_, _anniversary_, etc.)
+powershell -ExecutionPolicy Bypass -File scripts/deploy_local.ps1 -Product all
 ```
 
 ---
@@ -42,31 +58,38 @@ npm run package
 ```text
 MarketSyncData/
 ├── .github/workflows/
-│   ├── hourly-harvest.yml     # Hourly cron: gathers API data & commits block
-│   └── daily-compile.yml      # Daily cron (06:00 UTC): compiles data pack & publishes release
-├── MarketSyncData/            # In-game World of Warcraft companion addon
-│   ├── MarketSyncData.toc     # Multi-version client manifest (16001, 11509, 120001)
-│   ├── MarketSyncData.lua     # Daily compiled auction pricing data table
-│   └── Core.lua               # AddOn registration & ingestion into MarketSync
+│   ├── hourly-harvest.yml     # Cron (12,42 * * * *): harvests all 5 flavors & commits hourly block
+│   └── daily-compile.yml      # Cron (20 6 * * *): compiles 90-day per-flavor packs & publishes releases
+├── MarketSyncData/            # Core Lua addon loader + default manifest
+│   ├── MarketSyncData.toc     # Client interface manifest
+│   ├── MarketSyncData.lua     # Compiled Lua pricing table
+│   └── Core.lua               # Flavor-guarded ingestion into MarketSync
 ├── scripts/
-│   ├── harvest.js             # Hourly harvest script using @pinta365/blizzard_api
-│   ├── compile.js             # Aggregates hourly blocks into MarketSyncData.lua
-│   └── package.js             # Packages addon into dist/MarketSyncData.zip
-├── datasets/                  # Historical dataset blocks & database tracking manifest
-│   └── index.json             # Manifest of all recorded blocks
+│   ├── harvest.js             # Multi-flavor harvester using @pinta365/blizzard_api
+│   ├── compile.js             # 90-day per-flavor Lua dataset compiler (dist/builds/<Flavor>/)
+│   ├── package.js             # Builds MSData-<Flavor>-<Date>.zip release archives
+│   └── deploy_local.ps1       # Maps & deploys each flavor build to its local WoW client directory
+├── datasets/                  # Permanent historical dataset blocks partitioned by flavor & UTC date
+│   ├── forever/
+│   ├── anniversary/
+│   ├── classicEra/
+│   ├── classic/
+│   ├── retail/
+│   └── index.json             # Global manifest indexing every recorded snapshot block
 ├── docs/
-│   ├── ARCHITECTURE.md        # Technical architectural breakdown
-│   ├── DATASET_SCHEMA.md      # Hourly and compiled data schemas
-│   └── SETUP.md               # Guide to configuring Battle.net & GitHub secrets
+│   ├── ARCHITECTURE.md        # Pipeline, flavor isolation, and Forever house mapping details
+│   ├── DATASET_SCHEMA.md      # Hourly block, index manifest, and compiled Lua schemas
+│   └── SETUP.md               # Guide to configuring Battle.net, CurseForge, & GitHub secrets
 └── tests/
-    └── test_pipeline.js       # End-to-end integration tests
+    ├── test_pipeline.js       # Multi-flavor harvest, 90-day compile, & MSData-*.zip tests
+    └── test_lua_core.js       # Fengari Lua 5.1 ingestion & realmless empty-string regression test
 ```
 
 ---
 
 ## Documentation
 
-- **[Architecture & Ingestion Pipeline](docs/ARCHITECTURE.md)**
+- **[Architecture & Multi-Flavor Pipeline](docs/ARCHITECTURE.md)**
 - **[Dataset & Lua Table Schemas](docs/DATASET_SCHEMA.md)**
 - **[Battle.net API & GitHub Setup Guide](docs/SETUP.md)**
 

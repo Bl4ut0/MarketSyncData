@@ -1,11 +1,12 @@
 /**
  * MarketSync DataSync - Multi-Flavor Release Packager
  * 
- * Packages each game flavor's MarketSyncData build into a clean .zip archive:
- *   - dist/MarketSyncData-Forever.zip
- *   - dist/MarketSyncData-ClassicEra.zip
- *   - dist/MarketSyncData-Classic.zip
- *   - dist/MarketSyncData-Retail.zip
+ * Packages each game flavor's 90-day MarketSyncData build into a dated .zip archive:
+ *   - dist/MSData-Forever-YYYY-MM-DD.zip
+ *   - dist/MSData-Anniversary-YYYY-MM-DD.zip
+ *   - dist/MSData-ClassicEra-YYYY-MM-DD.zip
+ *   - dist/MSData-Classic-YYYY-MM-DD.zip
+ *   - dist/MSData-Retail-YYYY-MM-DD.zip
  */
 
 const fs = require('fs');
@@ -36,7 +37,7 @@ function zipDirectory(sourceAddonDir, outputZipPath) {
   }
 }
 
-function packageAll() {
+function packageAll(dateStr = new Date().toISOString().slice(0, 10)) {
   const outputs = [];
   for (const cfg of Object.values(FLAVOR_CONFIG)) {
     const buildAddonDir = path.join(BUILDS_DIR, cfg.label, 'MarketSyncData');
@@ -45,7 +46,7 @@ function packageAll() {
       continue;
     }
 
-    const outputZip = path.join(DIST_DIR, `MarketSyncData-${cfg.label}.zip`);
+    const outputZip = path.join(DIST_DIR, `MSData-${cfg.label}-${dateStr}.zip`);
     zipDirectory(buildAddonDir, outputZip);
     const sizeKB = Math.round(fs.statSync(outputZip).size / 1024);
     console.log(`[Packager] Built ${outputZip} (${sizeKB} KB)`);
@@ -56,7 +57,8 @@ function packageAll() {
 }
 
 if (require.main === module) {
-  packageAll();
+  const argDate = process.argv[2];
+  packageAll(argDate);
 }
 
 module.exports = { packageAll };

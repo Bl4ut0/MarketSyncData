@@ -34,18 +34,20 @@ jobs:
       - name: Run Pipeline Tests
         run: npm test
 
-      - name: Compile Daily Dataset
+      - name: Compile Daily 90-Day Datasets
         run: npm run compile
-
-      - name: Package AddOn Distribution Archive
-        run: npm run package
 
       - name: Set Release Tag
         id: vars
         run: |
           DATE_TAG=$(date -u +"%Y.%m.%d")
+          ISO_DATE=$(date -u +"%Y-%m-%d")
           echo "tag=v${DATE_TAG}" >> $GITHUB_OUTPUT
           echo "date=${DATE_TAG}" >> $GITHUB_OUTPUT
+          echo "iso_date=${ISO_DATE}" >> $GITHUB_OUTPUT
+
+      - name: Package Per-Flavor Distribution Archives
+        run: node scripts/package.js "${{ steps.vars.outputs.iso_date }}"
 
       - name: Commit Compiled Dataset & TOC
         run: |
@@ -61,22 +63,25 @@ jobs:
           tag_name: ${{ steps.vars.outputs.tag }}
           name: "MarketSyncData ${{ steps.vars.outputs.date }}"
           body: |
-            ## MarketSyncData Daily Auction Pack (${{ steps.vars.outputs.date }})
+            ## MarketSyncData Daily Auction Packs (${{ steps.vars.outputs.date }})
             
-            Compiled daily baseline auction house pricing data for World of Warcraft: Forever.
+            Compiled 90-day rolling auction house & commodity pricing packs for all supported World of Warcraft versions.
+            Each release archive contains **strictly its own flavor's dataset** trimmed to the latest 90 days (while full hourly snapshots remain archived in GitHub under `datasets/`):
             
-            - **Data Format**: Pre-compiled Base-36 pricing tables for instant offline browsing.
-            - **Auto-Sync**: Automatically ingested into MarketSync on login.
-            - **Compatibility**: Targets Interface 16001 (Forever), 11509 (Classic Era), and 120001 (Modern).
+            - `MSData-Forever-${{ steps.vars.outputs.iso_date }}.zip` — **WoW: Forever** (Interface `16001` — PvP, Normal, RP, RP-PvP)
+            - `MSData-Anniversary-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Anniversary** (`dreamscythe`, `nightslayer`, `maladath`)
+            - `MSData-ClassicEra-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Era / SoD / Hardcore** (Interface `11509`, `11508`)
+            - `MSData-Classic-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Progression** (Interface `50503`, `38000`, `20506`, `20505`)
+            - `MSData-Retail-${{ steps.vars.outputs.iso_date }}.zip` — **Retail** (Interface `120001`, `120000`)
             
             ### Installation:
-            Extract `MarketSyncData.zip` into your `World of Warcraft/_forever_/Interface/AddOns/` directory alongside `MarketSync`.
+            Download the archive matching your game version and extract the `MarketSyncData` folder into your client's `Interface/AddOns/` directory alongside `MarketSync`.
           files: |
-            dist/MarketSyncData-Forever.zip
-            dist/MarketSyncData-Anniversary.zip
-            dist/MarketSyncData-ClassicEra.zip
-            dist/MarketSyncData-Classic.zip
-            dist/MarketSyncData-Retail.zip
+            dist/MSData-Forever-${{ steps.vars.outputs.iso_date }}.zip
+            dist/MSData-Anniversary-${{ steps.vars.outputs.iso_date }}.zip
+            dist/MSData-ClassicEra-${{ steps.vars.outputs.iso_date }}.zip
+            dist/MSData-Classic-${{ steps.vars.outputs.iso_date }}.zip
+            dist/MSData-Retail-${{ steps.vars.outputs.iso_date }}.zip
             dist/compile-summary.json
 
       - name: Upload to CurseForge (Optional)
@@ -85,18 +90,20 @@ jobs:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           CURSEFORGE_PROJECT_ID: ${{ secrets.CURSEFORGE_PROJECT_ID }}
         run: |
-          echo "CurseForge token found. Submitting release to CurseForge API..."
-          # Uses CurseForge Upload API if secrets are configured
-          METADATA=$(cat <<EOF
+          echo "CurseForge token found. Submitting per-flavor releases to CurseForge API..."
+          for ARCHIVE in dist/MSData-*-${{ steps.vars.outputs.iso_date }}.zip; do
+            echo "Uploading $ARCHIVE..."
+            METADATA=$(cat <<EOF
           {
-            "changelog": "Daily compiled auction pricing data pack for ${{ steps.vars.outputs.date }}.",
+            "changelog": "Daily 90-day compiled auction pricing data pack for ${{ steps.vars.outputs.date }} ($(basename "$ARCHIVE")).",
             "changelogType": "markdown",
             "releaseType": "release",
-            "gameVersions": [116001, 11509]
+            "gameVersions": [116001, 11509, 20506, 50503, 120001]
           }
           EOF
-          )
-          curl -s -X POST "https://wow.curseforge.com/api/projects/${CURSEFORGE_PROJECT_ID}/upload-file" \
-            -H "x-api-token: ${CURSEFORGE_TOKEN}" \
-            -F "metadata=${METADATA}" \
-            -F "file=@dist/MarketSyncData.zip" || true
+            )
+            curl -s -X POST "https://wow.curseforge.com/api/projects/${CURSEFORGE_PROJECT_ID}/upload-file" \
+              -H "x-api-token: ${CURSEFORGE_TOKEN}" \
+              -F "metadata=${METADATA}" \
+              -F "file=@${ARCHIVE}" || true
+          done

@@ -55,12 +55,15 @@ async function runTests() {
 
   // 4. Test Multi-Flavor Packager
   console.log('Testing multi-flavor zip packager...');
-  const zips = packageAll();
+  const expectedDate = new Date().toISOString().slice(0, 10);
+  const zips = packageAll(expectedDate);
   assert.strictEqual(zips.length, 5);
-  for (const zipPath of zips) {
-    assert.ok(fs.existsSync(zipPath), `Missing zip: ${zipPath}`);
+  for (const label of ['Forever', 'Anniversary', 'ClassicEra', 'Classic', 'Retail']) {
+    const expectedPath = path.join(__dirname, `../dist/MSData-${label}-${expectedDate}.zip`);
+    assert.ok(zips.includes(expectedPath), `Expected zip in outputs: ${expectedPath}`);
+    assert.ok(fs.existsSync(expectedPath) && fs.statSync(expectedPath).size > 0, `Missing or empty zip: ${expectedPath}`);
   }
-  console.log('  [PASS] Packager built all 5 release archives.');
+  console.log(`  [PASS] Packager built all 5 MSData-<Flavor>-${expectedDate}.zip archives.`);
 
   console.log('\nAll multi-flavor pipeline integration tests passed successfully!\n');
 }
