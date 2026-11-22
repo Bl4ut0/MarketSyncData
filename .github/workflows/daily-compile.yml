@@ -53,7 +53,7 @@ jobs:
         run: |
           git config --local user.name "MarketSync Compiler"
           git config --local user.email "compiler@marketsync.local"
-          git add MarketSyncData/ dist/compile-summary.json
+          git add MarketSyncData/
           git commit -m "chore(release): compile daily dataset pack (${{ steps.vars.outputs.date }})" || echo "No changes to commit"
           git push
 
