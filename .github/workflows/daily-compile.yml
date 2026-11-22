@@ -85,25 +85,52 @@ jobs:
             dist/compile-summary.json
 
       - name: Upload to CurseForge (Optional)
-        if: env.CURSEFORGE_TOKEN != '' && env.CURSEFORGE_PROJECT_ID != ''
+        if: env.CURSEFORGE_TOKEN != ''
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
-          CURSEFORGE_PROJECT_ID: ${{ secrets.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_PROJECT_ID: '1824426'
+          RELEASE_DATE: ${{ steps.vars.outputs.iso_date }}
         run: |
-          echo "CurseForge token found. Submitting per-flavor releases to CurseForge API..."
-          for ARCHIVE in dist/MSData-*-${{ steps.vars.outputs.iso_date }}.zip; do
-            echo "Uploading $ARCHIVE..."
-            METADATA=$(cat <<EOF
-          {
-            "changelog": "Daily 90-day compiled auction pricing data pack for ${{ steps.vars.outputs.date }} ($(basename "$ARCHIVE")).",
-            "changelogType": "markdown",
-            "releaseType": "release",
-            "gameVersions": [116001, 11509, 20506, 50503, 120001]
-          }
-          EOF
-            )
-            curl -s -X POST "https://wow.curseforge.com/api/projects/${CURSEFORGE_PROJECT_ID}/upload-file" \
-              -H "x-api-token: ${CURSEFORGE_TOKEN}" \
-              -F "metadata=${METADATA}" \
-              -F "file=@${ARCHIVE}" || true
-          done
+          endpoint=https://wow.curseforge.com/api
+          catalog=$(curl --fail-with-body --silent --show-error \
+            -H "X-Api-Token: $CURSEFORGE_TOKEN" "$endpoint/game/wow/versions")
+
+          # An overlapping TOC interface does not make the datasets interchangeable.
+          # Assign Anniversary and Era their own tags; keep Progression separate.
+          targets='{
+            "Forever": ["1.60.1"],
+            "Anniversary": ["2.5.5", "2.5.6"],
+            "ClassicEra": ["1.15.8", "1.15.9"],
+            "Classic": ["3.8.0", "5.5.3"],
+            "Retail": ["12.0.0", "12.0.1"]
+          }'
+
+          plans=$(jq -cen --argjson catalog "$catalog" --argjson targets "$targets" \
+            --slurpfile summary dist/compile-summary.json '
+            [$summary[0].flavors[] | select(.totalUniqueItems > 0) | .label as $label |
+              ($targets[$label] // error("Unknown release flavor: " + $label)) as $names |
+              [$names[] as $name |
+                [$catalog[] | select(.name == $name and
+                  ($label != "Forever" or .gameVersionTypeID == 88568)) | .id] | unique |
+                if length > 1 then error("Ambiguous CurseForge version: " + $name) else .[] end
+              ] as $ids |
+              if ($ids | length) == 0 then error("No CurseForge versions for " + $label)
+              else {label: $label, ids: $ids} end
+            ]')
+
+          while IFS= read -r plan; do
+            label=$(jq -r '.label' <<< "$plan")
+            archive="dist/MSData-$label-$RELEASE_DATE.zip"
+            test -s "$archive"
+            metadata=$(jq -cn --arg label "$label" --arg date "$RELEASE_DATE" \
+              --argjson ids "$(jq -c '.ids' <<< "$plan")" '
+              {displayName: ("MarketSyncData " + $label + " " + $date),
+               changelog: ("Daily Auction House price history for " + $label + "."),
+               changelogType: "markdown", releaseType: "release", gameVersions: $ids}')
+            response=$(curl --fail-with-body --silent --show-error \
+              -H "X-Api-Token: $CURSEFORGE_TOKEN" \
+              -F "metadata=$metadata" -F "file=@$archive" \
+              "$endpoint/projects/$CURSEFORGE_PROJECT_ID/upload-file")
+            file_id=$(jq -er '.id | numbers' <<< "$response")
+            echo "Uploaded $archive as CurseForge file $file_id"
+          done < <(jq -c '.[]' <<< "$plans")
