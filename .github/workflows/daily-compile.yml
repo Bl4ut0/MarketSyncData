@@ -72,7 +72,10 @@ jobs:
             ### Installation:
             Extract `MarketSyncData.zip` into your `World of Warcraft/_forever_/Interface/AddOns/` directory alongside `MarketSync`.
           files: |
-            dist/MarketSyncData.zip
+            dist/MarketSyncData-Forever.zip
+            dist/MarketSyncData-ClassicEra.zip
+            dist/MarketSyncData-Classic.zip
+            dist/MarketSyncData-Retail.zip
             dist/compile-summary.json
 
       - name: Upload to CurseForge (Optional)

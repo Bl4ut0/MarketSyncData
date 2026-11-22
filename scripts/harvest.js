@@ -1,23 +1,31 @@
 /**
- * MarketSync DataSync - Hourly Auction Harvester
+ * MarketSync DataSync - Multi-Flavor Hourly Auction Harvester
  * 
- * Fetches auction house and commodity data via the Blizzard Battle.net Game Data API
- * (using @pinta365/blizzard_api for WoW: Forever realmless rulesets).
- * Saves structured hourly dataset blocks partitioned by date (YYYY-MM-DD/HH-00.json).
+ * Fetches auction house and commodity data across all supported WoW flavors:
+ *   - forever    (WoW: Forever rulesets)
+ *   - classicEra (Classic Era / Anniversary / SoD / Hardcore)
+ *   - classic    (Classic Progression: MoP / Cata / TBC)
+ *   - retail     (Modern WoW + Region-wide Commodities)
+ * 
+ * Enforces a 90-day rolling retention window on stored dataset blocks.
  */
 
 const fs = require('fs');
 const path = require('path');
-const zlib = require('zlib');
 const { createClient } = require('@pinta365/blizzard_api');
 
 const REGION = process.env.BLIZZARD_REGION || 'us';
 const CLIENT_ID = process.env.BLIZZARD_CLIENT_ID;
 const CLIENT_SECRET = process.env.BLIZZARD_CLIENT_SECRET;
+const FLAVORS = (process.env.HARVEST_FLAVORS || 'forever,classicEra,classic,retail')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '90', 10);
+
 const DATASETS_DIR = path.join(__dirname, '../datasets');
 const INDEX_FILE = path.join(DATASETS_DIR, 'index.json');
 
-// Ensure dataset root exists
 if (!fs.existsSync(DATASETS_DIR)) {
   fs.mkdirSync(DATASETS_DIR, { recursive: true });
 }
@@ -38,17 +46,47 @@ function saveIndex(index) {
 }
 
 /**
+ * Prune dataset blocks older than RETENTION_DAYS (default 90 days)
+ */
+function pruneOldBlocks(retentionDays = RETENTION_DAYS) {
+  const cutoffMs = Date.now() - retentionDays * 86400 * 1000;
+  const cutoffDate = new Date(cutoffMs).toISOString().slice(0, 10);
+  let prunedCount = 0;
+
+  for (const flavor of ['forever', 'classicEra', 'classic', 'retail']) {
+    const flavorDir = path.join(DATASETS_DIR, flavor);
+    if (!fs.existsSync(flavorDir)) continue;
+
+    for (const dateDir of fs.readdirSync(flavorDir)) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateDir) && dateDir < cutoffDate) {
+        fs.rmSync(path.join(flavorDir, dateDir), { recursive: true, force: true });
+        prunedCount++;
+      }
+    }
+  }
+
+  const index = getIndex();
+  const before = index.blocks.length;
+  index.blocks = index.blocks.filter(b => b.date >= cutoffDate);
+  if (index.blocks.length !== before) {
+    saveIndex(index);
+  }
+
+  if (prunedCount > 0) {
+    console.log(`[Retention] Pruned ${prunedCount} date directories older than ${cutoffDate} (${retentionDays}d).`);
+  }
+}
+
+/**
  * Process raw auction and commodity listings into an aggregated item price map
  */
 function aggregateAuctionListings(auctions = [], commodities = [], timestamp = Math.floor(Date.now() / 1000)) {
   const itemMap = {};
 
-  // 1. Process standard equipment / item listings
   for (const auc of auctions) {
     if (!auc.item || !auc.item.id) continue;
     const itemId = auc.item.id;
     const qty = auc.quantity || 1;
-    // Calculate per-unit price in copper
     let unitPrice = 0;
     if (auc.buyout && auc.buyout > 0) {
       unitPrice = Math.floor(auc.buyout / qty);
@@ -57,7 +95,6 @@ function aggregateAuctionListings(auctions = [], commodities = [], timestamp = M
     }
     if (unitPrice <= 0) continue;
 
-    // Support random suffixes / modifiers if present
     const key = (auc.item.modifiers && auc.item.modifiers.length > 0)
       ? `${itemId}:${auc.item.modifiers[0].value}`
       : String(itemId);
@@ -79,7 +116,6 @@ function aggregateAuctionListings(auctions = [], commodities = [], timestamp = M
     }
   }
 
-  // 2. Process commodities
   for (const com of commodities) {
     if (!com.item || !com.item.id) continue;
     const itemId = String(com.item.id);
@@ -107,177 +143,255 @@ function aggregateAuctionListings(auctions = [], commodities = [], timestamp = M
   return itemMap;
 }
 
-async function harvest() {
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
-  const hourStr = String(now.getUTCHours()).padStart(2, '0'); // HH
-  const unixNow = Math.floor(now.getTime() / 1000);
+async function harvestForever(client, unixNow) {
+  const partitions = {};
+  let totalItems = 0;
+  let totalVolume = 0;
 
-  console.log(`[MarketSyncData Harvester] Starting harvest for ${dateStr} ${hourStr}:00 UTC...`);
+  const rulesetsResp = await client.wowForever.rulesets();
+  const rulesetList = rulesetsResp.rulesets || [];
+  console.log(`[Forever] Found ${rulesetList.length} rulesets.`);
 
-  if (!CLIENT_ID || !CLIENT_SECRET) {
-    console.warn(`[WARNING] BLIZZARD_CLIENT_ID or BLIZZARD_CLIENT_SECRET not provided.`);
-    console.warn(`Generating simulated test dataset block for offline validation.`);
-    
-    // Generate valid sample data block for verification
-    const sampleItems = {
-      '13464': { minPrice: 12500, maxPrice: 15000, totalQty: 48, listings: 6, time: unixNow }, // Golden Sansam
-      '13463': { minPrice: 8500, maxPrice: 9200, totalQty: 120, listings: 12, time: unixNow }, // Dreamfoil
-      '14344': { minPrice: 220000, maxPrice: 245000, totalQty: 4, listings: 4, time: unixNow }, // Large Brilliant Shard
-      '14343': { minPrice: 45000, maxPrice: 50000, totalQty: 35, listings: 9, time: unixNow }, // Small Brilliant Shard
-      '17011': { minPrice: 14000, maxPrice: 15500, totalQty: 80, listings: 10, time: unixNow }, // Lava Core
-      '11382': { minPrice: 1800, maxPrice: 2200, totalQty: 250, listings: 22, time: unixNow }, // Bloodvine
-    };
+  for (const rsRef of rulesetList) {
+    const rsId = rsRef.id;
+    const rsData = await client.wowForever.ruleset(rsId);
+    const rsName = (rsData.name && (rsData.name.en_US || rsData.name.en_GB || Object.values(rsData.name)[0])) || `ruleset${rsId}`;
+    const canonicalName = String(rsName).toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    const targetDir = path.join(DATASETS_DIR, dateStr);
-    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+    if (!partitions[canonicalName]) partitions[canonicalName] = {};
 
-    const blockPath = path.join(targetDir, `${hourStr}-00.json`);
-    const blockData = {
-      version: '1.0',
-      timestamp: unixNow,
-      isoDate: now.toISOString(),
-      region: REGION,
-      rulesets: {
-        'english': {
-          Horde: sampleItems,
-          Alliance: sampleItems,
-          Neutral: sampleItems
-        }
-      },
-      stats: {
-        totalItems: Object.keys(sampleItems).length,
-        totalVolume: Object.values(sampleItems).reduce((sum, i) => sum + i.totalQty, 0),
-        status: 'simulated'
-      }
-    };
+    const housesResp = await client.wowForever.auctionHouses(rsId);
+    for (const house of (housesResp.auctions || [])) {
+      const houseId = house.id;
+      let houseName = house.name || 'Faction';
+      if (houseId === 2 || String(houseName).toLowerCase().includes('horde')) houseName = 'Horde';
+      else if (houseId === 6 || String(houseName).toLowerCase().includes('alliance')) houseName = 'Alliance';
+      else if (houseId === 7 || String(houseName).toLowerCase().includes('neutral') || String(houseName).toLowerCase().includes('blackwater')) houseName = 'Neutral';
 
-    fs.writeFileSync(blockPath, JSON.stringify(blockData, null, 2), 'utf8');
+      let auctions = [];
+      let commodities = [];
+      try { auctions = (await client.wowForever.auctionHouse(rsId, houseId)).auctions || []; } catch {}
+      try { commodities = (await client.wowForever.auctionHouseCommodities(rsId, houseId)).auctions || []; } catch {}
 
-    // Update index manifest
-    const index = getIndex();
-    index.blocks = index.blocks.filter(b => !(b.date === dateStr && b.hour === hourStr));
-    index.blocks.push({
-      date: dateStr,
-      hour: hourStr,
-      path: `datasets/${dateStr}/${hourStr}-00.json`,
-      items: blockData.stats.totalItems,
-      volume: blockData.stats.totalVolume,
-      timestamp: unixNow,
-      simulated: true
-    });
-    index.lastUpdated = now.toISOString();
-    saveIndex(index);
+      const aggregated = aggregateAuctionListings(auctions, commodities, unixNow);
+      partitions[canonicalName][houseName] = aggregated;
 
-    console.log(`[MarketSyncData Harvester] Wrote simulated block to ${blockPath}`);
-    return blockData;
+      const count = Object.keys(aggregated).length;
+      totalItems += count;
+      totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
+      console.log(`  [Forever] ${canonicalName}@${houseName}: ${count} unique items`);
+    }
   }
 
-  // Live Blizzard API harvest
-  const client = createClient({
-    region: REGION,
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET
-  });
+  return { partitions, totalItems, totalVolume };
+}
 
-  const dataset = {
-    version: '1.0',
-    timestamp: unixNow,
-    isoDate: now.toISOString(),
-    region: REGION,
-    rulesets: {},
-    stats: {
-      totalItems: 0,
-      totalVolume: 0,
-      status: 'live'
-    }
-  };
+async function harvestClassicEra(client, unixNow) {
+  const partitions = {};
+  let totalItems = 0;
+  let totalVolume = 0;
 
-  try {
-    const rulesetsResp = await client.wowForever.rulesets();
-    const rulesetList = rulesetsResp.rulesets || [];
-    console.log(`Found ${rulesetList.length} Forever rulesets.`);
+  const crResp = await client.wowClassicEra.connectedRealms();
+  const crLinks = crResp.connected_realms || [];
+  console.log(`[ClassicEra/Anniversary] Found ${crLinks.length} connected realms.`);
 
-    for (const rsRef of rulesetList) {
-      const rsId = rsRef.id;
-      const rsData = await client.wowForever.ruleset(rsId);
-      const rsName = (rsData.name && (rsData.name.en_US || rsData.name.en_GB || Object.values(rsData.name)[0])) || `Ruleset-${rsId}`;
-      const canonicalName = String(rsName).toLowerCase().replace(/[^a-z0-9]/g, '');
+  for (const crLink of crLinks) {
+    const match = String(crLink.href || '').match(/connected-realm\/(\d+)/);
+    if (!match) continue;
+    const crId = parseInt(match[1], 10);
 
-      dataset.rulesets[canonicalName] = {};
+    let realmLabel = `cr${crId}`;
+    try {
+      const crData = await client.wowClassicEra.connectedRealm(crId);
+      const firstRealm = crData.realms && crData.realms[0];
+      if (firstRealm && firstRealm.slug) realmLabel = firstRealm.slug;
+    } catch {}
 
-      const housesResp = await client.wowForever.auctionHouses(rsId);
-      const houses = housesResp.auctions || [];
-
-      for (const house of houses) {
+    partitions[realmLabel] = {};
+    try {
+      const housesResp = await client.wowClassicEra.auctionHouses(crId);
+      for (const house of (housesResp.auctions || [])) {
         const houseId = house.id;
         let houseName = house.name || 'Faction';
         if (houseId === 2 || String(houseName).toLowerCase().includes('horde')) houseName = 'Horde';
         else if (houseId === 6 || String(houseName).toLowerCase().includes('alliance')) houseName = 'Alliance';
         else if (houseId === 7 || String(houseName).toLowerCase().includes('neutral') || String(houseName).toLowerCase().includes('blackwater')) houseName = 'Neutral';
 
-        console.log(`Fetching auctions for ${rsName} -> ${houseName} (House ID: ${houseId})...`);
-        
         let auctions = [];
-        let commodities = [];
+        try { auctions = (await client.wowClassicEra.auctionHouse(crId, houseId)).auctions || []; } catch {}
 
-        try {
-          const aucResp = await client.wowForever.auctionHouse(rsId, houseId);
-          auctions = aucResp.auctions || [];
-        } catch (err) {
-          console.warn(`Could not fetch regular auctions for house ${houseId}: ${err.message}`);
-        }
+        const aggregated = aggregateAuctionListings(auctions, [], unixNow);
+        partitions[realmLabel][houseName] = aggregated;
 
-        try {
-          const comResp = await client.wowForever.auctionHouseCommodities(rsId, houseId);
-          commodities = comResp.auctions || [];
-        } catch (err) {
-          console.warn(`Could not fetch commodities for house ${houseId}: ${err.message}`);
-        }
-
-        const aggregated = aggregateAuctionListings(auctions, commodities, unixNow);
-        dataset.rulesets[canonicalName][houseName] = aggregated;
-
-        const itemCount = Object.keys(aggregated).length;
-        dataset.stats.totalItems += itemCount;
-        dataset.stats.totalVolume += Object.values(aggregated).reduce((sum, i) => sum + i.totalQty, 0);
-
-        console.log(`  -> ${houseName}: ${auctions.length} auctions, ${commodities.length} commodities => ${itemCount} unique items.`);
+        const count = Object.keys(aggregated).length;
+        totalItems += count;
+        totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
       }
+      console.log(`  [ClassicEra] ${realmLabel}: harvested`);
+    } catch (err) {
+      console.warn(`  [ClassicEra] Skipped ${realmLabel}: ${err.message}`);
     }
-
-    const targetDir = path.join(DATASETS_DIR, dateStr);
-    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-
-    const blockPath = path.join(targetDir, `${hourStr}-00.json`);
-    fs.writeFileSync(blockPath, JSON.stringify(dataset, null, 2), 'utf8');
-
-    // Update index manifest
-    const index = getIndex();
-    index.blocks = index.blocks.filter(b => !(b.date === dateStr && b.hour === hourStr));
-    index.blocks.push({
-      date: dateStr,
-      hour: hourStr,
-      path: `datasets/${dateStr}/${hourStr}-00.json`,
-      items: dataset.stats.totalItems,
-      volume: dataset.stats.totalVolume,
-      timestamp: unixNow,
-      simulated: false
-    });
-    index.lastUpdated = now.toISOString();
-    saveIndex(index);
-
-    console.log(`[MarketSyncData Harvester] Successfully saved hourly block to ${blockPath}`);
-    return dataset;
-
-  } catch (error) {
-    console.error(`[MarketSyncData Harvester Error]`, error);
-    process.exit(1);
   }
+
+  return { partitions, totalItems, totalVolume };
+}
+
+async function harvestClassic(client, unixNow) {
+  const partitions = {};
+  let totalItems = 0;
+  let totalVolume = 0;
+
+  const crResp = await client.wowClassic.connectedRealms();
+  const crLinks = crResp.connected_realms || [];
+  console.log(`[Classic Progression] Found ${crLinks.length} connected realms.`);
+
+  for (const crLink of crLinks) {
+    const match = String(crLink.href || '').match(/connected-realm\/(\d+)/);
+    if (!match) continue;
+    const crId = parseInt(match[1], 10);
+
+    let realmLabel = `cr${crId}`;
+    try {
+      const crData = await client.wowClassic.connectedRealm(crId);
+      const firstRealm = crData.realms && crData.realms[0];
+      if (firstRealm && firstRealm.slug) realmLabel = firstRealm.slug;
+    } catch {}
+
+    try {
+      const aucResp = await client.wowClassic.auctions(crId);
+      const auctions = aucResp.auctions || [];
+      const aggregated = aggregateAuctionListings(auctions, [], unixNow);
+      partitions[realmLabel] = { CrossFaction: aggregated };
+
+      const count = Object.keys(aggregated).length;
+      totalItems += count;
+      totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
+      console.log(`  [Classic] ${realmLabel}: ${count} unique items`);
+    } catch (err) {
+      console.warn(`  [Classic] Skipped ${realmLabel}: ${err.message}`);
+    }
+  }
+
+  return { partitions, totalItems, totalVolume };
+}
+
+async function harvestRetail(client, unixNow) {
+  const partitions = {};
+  let totalItems = 0;
+  let totalVolume = 0;
+
+  // Region-wide commodities
+  try {
+    const comResp = await client.wow.commodities();
+    const commodities = comResp.auctions || [];
+    const comAgg = aggregateAuctionListings([], commodities, unixNow);
+    partitions['region'] = { Commodities: comAgg };
+    totalItems += Object.keys(comAgg).length;
+    totalVolume += Object.values(comAgg).reduce((s, i) => s + i.totalQty, 0);
+    console.log(`  [Retail] Region Commodities: ${Object.keys(comAgg).length} unique items`);
+  } catch (err) {
+    console.warn(`  [Retail] Commodities failed: ${err.message}`);
+  }
+
+  return { partitions, totalItems, totalVolume };
+}
+
+async function saveFlavorBlock(flavor, dateStr, hourStr, now, unixNow, result, simulated = false) {
+  const targetDir = path.join(DATASETS_DIR, flavor, dateStr);
+  if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+
+  const blockPath = path.join(targetDir, `${hourStr}-00.json`);
+  const blockData = {
+    version: '1.0',
+    flavor,
+    timestamp: unixNow,
+    isoDate: now.toISOString(),
+    region: REGION,
+    rulesets: result.partitions,
+    stats: {
+      totalItems: result.totalItems,
+      totalVolume: result.totalVolume,
+      status: simulated ? 'simulated' : 'live'
+    }
+  };
+
+  fs.writeFileSync(blockPath, JSON.stringify(blockData, null, 2), 'utf8');
+
+  const index = getIndex();
+  index.blocks = index.blocks.filter(b => !(b.flavor === flavor && b.date === dateStr && b.hour === hourStr));
+  index.blocks.push({
+    flavor,
+    date: dateStr,
+    hour: hourStr,
+    path: `datasets/${flavor}/${dateStr}/${hourStr}-00.json`,
+    items: result.totalItems,
+    volume: result.totalVolume,
+    timestamp: unixNow,
+    simulated
+  });
+  index.lastUpdated = now.toISOString();
+  saveIndex(index);
+
+  console.log(`[Harvester] Saved ${flavor} block -> ${blockPath} (${result.totalItems} items)`);
+  return blockData;
+}
+
+async function harvest() {
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10);
+  const hourStr = String(now.getUTCHours()).padStart(2, '0');
+  const unixNow = Math.floor(now.getTime() / 1000);
+
+  console.log(`[MarketSyncData Harvester] Starting multi-flavor harvest (${FLAVORS.join(', ')}) for ${dateStr} ${hourStr}:00 UTC...`);
+
+  pruneOldBlocks(RETENTION_DAYS);
+
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.warn(`[WARNING] BLIZZARD_CLIENT_ID or BLIZZARD_CLIENT_SECRET not provided. Generating simulated blocks.`);
+    const sampleItems = {
+      '13464': { minPrice: 12500, maxPrice: 15000, totalQty: 48, listings: 6, time: unixNow },
+      '13463': { minPrice: 8500, maxPrice: 9200, totalQty: 120, listings: 12, time: unixNow },
+      '14344': { minPrice: 220000, maxPrice: 245000, totalQty: 4, listings: 4, time: unixNow }
+    };
+    const results = {};
+    for (const flavor of FLAVORS) {
+      results[flavor] = await saveFlavorBlock(flavor, dateStr, hourStr, now, unixNow, {
+        partitions: { english: { Horde: sampleItems, Alliance: sampleItems, Neutral: sampleItems } },
+        totalItems: 9,
+        totalVolume: 516
+      }, true);
+    }
+    return results;
+  }
+
+  const client = createClient({
+    region: REGION,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET
+  });
+
+  const results = {};
+  for (const flavor of FLAVORS) {
+    try {
+      let res;
+      if (flavor === 'forever') res = await harvestForever(client, unixNow);
+      else if (flavor === 'classicEra') res = await harvestClassicEra(client, unixNow);
+      else if (flavor === 'classic') res = await harvestClassic(client, unixNow);
+      else if (flavor === 'retail') res = await harvestRetail(client, unixNow);
+
+      if (res) {
+        results[flavor] = await saveFlavorBlock(flavor, dateStr, hourStr, now, unixNow, res, false);
+      }
+    } catch (err) {
+      console.error(`[Harvester Error] Flavor ${flavor} failed: ${err.message}`);
+    }
+  }
+
+  return results;
 }
 
 if (require.main === module) {
   harvest();
 }
 
-module.exports = { harvest, aggregateAuctionListings };
+module.exports = { harvest, aggregateAuctionListings, pruneOldBlocks };
