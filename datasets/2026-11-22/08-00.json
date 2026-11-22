@@ -1,0 +1,147 @@
+{
+  "version": "1.0",
+  "timestamp": 1795335795,
+  "isoDate": "2026-11-22T08:23:15.379Z",
+  "region": "us",
+  "rulesets": {
+    "english": {
+      "Horde": {
+        "11382": {
+          "minPrice": 1800,
+          "maxPrice": 2200,
+          "totalQty": 250,
+          "listings": 22,
+          "time": 1795335795
+        },
+        "13463": {
+          "minPrice": 8500,
+          "maxPrice": 9200,
+          "totalQty": 120,
+          "listings": 12,
+          "time": 1795335795
+        },
+        "13464": {
+          "minPrice": 12500,
+          "maxPrice": 15000,
+          "totalQty": 48,
+          "listings": 6,
+          "time": 1795335795
+        },
+        "14343": {
+          "minPrice": 45000,
+          "maxPrice": 50000,
+          "totalQty": 35,
+          "listings": 9,
+          "time": 1795335795
+        },
+        "14344": {
+          "minPrice": 220000,
+          "maxPrice": 245000,
+          "totalQty": 4,
+          "listings": 4,
+          "time": 1795335795
+        },
+        "17011": {
+          "minPrice": 14000,
+          "maxPrice": 15500,
+          "totalQty": 80,
+          "listings": 10,
+          "time": 1795335795
+        }
+      },
+      "Alliance": {
+        "11382": {
+          "minPrice": 1800,
+          "maxPrice": 2200,
+          "totalQty": 250,
+          "listings": 22,
+          "time": 1795335795
+        },
+        "13463": {
+          "minPrice": 8500,
+          "maxPrice": 9200,
+          "totalQty": 120,
+          "listings": 12,
+          "time": 1795335795
+        },
+        "13464": {
+          "minPrice": 12500,
+          "maxPrice": 15000,
+          "totalQty": 48,
+          "listings": 6,
+          "time": 1795335795
+        },
+        "14343": {
+          "minPrice": 45000,
+          "maxPrice": 50000,
+          "totalQty": 35,
+          "listings": 9,
+          "time": 1795335795
+        },
+        "14344": {
+          "minPrice": 220000,
+          "maxPrice": 245000,
+          "totalQty": 4,
+          "listings": 4,
+          "time": 1795335795
+        },
+        "17011": {
+          "minPrice": 14000,
+          "maxPrice": 15500,
+          "totalQty": 80,
+          "listings": 10,
+          "time": 1795335795
+        }
+      },
+      "Neutral": {
+        "11382": {
+          "minPrice": 1800,
+          "maxPrice": 2200,
+          "totalQty": 250,
+          "listings": 22,
+          "time": 1795335795
+        },
+        "13463": {
+          "minPrice": 8500,
+          "maxPrice": 9200,
+          "totalQty": 120,
+          "listings": 12,
+          "time": 1795335795
+        },
+        "13464": {
+          "minPrice": 12500,
+          "maxPrice": 15000,
+          "totalQty": 48,
+          "listings": 6,
+          "time": 1795335795
+        },
+        "14343": {
+          "minPrice": 45000,
+          "maxPrice": 50000,
+          "totalQty": 35,
+          "listings": 9,
+          "time": 1795335795
+        },
+        "14344": {
+          "minPrice": 220000,
+          "maxPrice": 245000,
+          "totalQty": 4,
+          "listings": 4,
+          "time": 1795335795
+        },
+        "17011": {
+          "minPrice": 14000,
+          "maxPrice": 15500,
+          "totalQty": 80,
+          "listings": 10,
+          "time": 1795335795
+        }
+      }
+    }
+  },
+  "stats": {
+    "totalItems": 6,
+    "totalVolume": 537,
+    "status": "simulated"
+  }
+}
