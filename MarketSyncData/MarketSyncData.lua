@@ -1,12 +1,12 @@
 -- ============================================================================
 -- MarketSyncData (forever) - 90-Day Compiled Auction Dataset (2026-11-22)
 -- ============================================================================
--- Generated: 2026-11-22T17:29:13.003Z
+-- Generated: 2026-11-22T17:31:52.873Z
 -- Retention Window: 90 days | Blocks Merged: 4
 -- ============================================================================
 
 MarketSyncDataDB = MarketSyncDataDB or {}
-MarketSyncData.generatedAt = 1795368553
+MarketSyncData.generatedAt = 1795368712
 MarketSyncData.version = "2026.11.22"
 MarketSyncData.flavor = "forever"
 
