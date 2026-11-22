@@ -2,62 +2,85 @@ name: Hourly Auction Harvester
 
 on:
   schedule:
-    # Off-peak minutes (:12 with a :42 backup retry if GitHub delays/drops :12 under load)
     - cron: '12,42 * * * *'
   workflow_dispatch:
+    inputs:
+      diagnostic_only:
+        description: Validate the harvester against Blizzard without publishing data
+        type: boolean
+        default: false
 
 concurrency:
-  group: harvest-group
+  group: harvest-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  harvest:
-    name: Harvest Hourly Auction Block
+  validate:
+    if: github.event_name == 'workflow_dispatch' && (github.ref_name != github.event.repository.default_branch || inputs.diagnostic_only)
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     permissions:
-      contents: write
-
+      contents: read
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-
-      - name: Check Current UTC Hour Status
-        id: check
-        run: |
-          HOUR_FILE="datasets/forever/$(date -u +%Y-%m-%d)/$(date -u +%H)-00.json"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "$HOUR_FILE" ]; then
-            echo "Current UTC hour already harvested ($HOUR_FILE); skipping retry."
-            echo "should_run=false" >> $GITHUB_OUTPUT
-          else
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Setup Node.js
-        if: steps.check.outputs.should_run == 'true'
-        uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Install Dependencies
-        if: steps.check.outputs.should_run == 'true'
-        run: npm ci || npm install
-
-      - name: Harvest Hourly Dataset Block
-        if: steps.check.outputs.should_run == 'true'
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - name: Validate live auction capture against Blizzard
         env:
-          BLIZZARD_REGION: 'us'
+          BLIZZARD_REGION: us
           BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
           BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
-        run: npm run harvest
+          REQUIRE_LIVE_HARVEST: '1'
+          DATASETS_DIR: ${{ runner.temp }}/marketsync-validation
+        run: |
+          npm run harvest
+          node tests/verify_live_capture.js
 
-      - name: Commit Hourly Dataset Block
-        if: steps.check.outputs.should_run == 'true'
+  harvest:
+    if: github.ref_name == github.event.repository.default_branch && !inputs.diagnostic_only
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check current UTC hour
+        id: check
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ] && node scripts/check-hour.js; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.check.outputs.should_run == 'true'
+        run: npm ci --ignore-scripts
+      - if: steps.check.outputs.should_run == 'true'
+        name: Harvest auction data
+        env:
+          BLIZZARD_REGION: us
+          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
+          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
+          REQUIRE_LIVE_HARVEST: '1'
+        run: npm run harvest
+      - if: steps.check.outputs.should_run == 'true'
+        name: Publish capture and source status
         run: |
           git config --local user.name "MarketSync Harvester"
           git config --local user.email "harvester@marketsync.local"
           git add datasets/
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git commit -m "chore(data): record hourly auction dataset block ($TIMESTAMP)" || echo "No changes to commit"
-          git push
+          if ! git diff --cached --quiet; then
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+            git commit -m "chore(data): record hourly auction dataset block ($TIMESTAMP)"
+            git pull --rebase
+            git push
+          fi

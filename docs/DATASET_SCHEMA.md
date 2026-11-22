@@ -51,6 +51,14 @@ Each flavor writes its own hourly snapshot block under `datasets/<flavor>/YYYY-M
 
 ---
 
+
+
+### Auction source status
+
+`datasets/harvest-status.json` records the latest authenticated attempt for each edition. Each market reports its status, upstream listing count, parsed item count, total quantity, and any HTTP failures. A confirmed empty API feed is marked `empty`. Failed requests are marked `unavailable` or `partial` when another feed supplied usable data.
+
+A failed market is omitted from the new snapshot. If an entire edition is unavailable, its earlier indexed captures stay available and the new failure appears in the status file. A same-hour retry preserves an earlier capture when the retry fails to recover one of its populated markets.
+
 ## 2. Tracking Manifest Schema (`datasets/index.json`)
 
 ```json
