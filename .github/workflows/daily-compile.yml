@@ -1,0 +1,99 @@
+name: Daily Dataset Compile & Release
+
+on:
+  schedule:
+    # Run once daily at 06:00 UTC (matching Raider.IO & Oribos Exchange standards)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: compile-group
+  cancel-in-progress: false
+
+jobs:
+  compile-and-release:
+    name: Compile Daily DataPack & Publish Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Pipeline Tests
+        run: npm test
+
+      - name: Compile Daily Dataset
+        run: npm run compile
+
+      - name: Package AddOn Distribution Archive
+        run: npm run package
+
+      - name: Set Release Tag
+        id: vars
+        run: |
+          DATE_TAG=$(date -u +"%Y.%m.%d")
+          echo "tag=v${DATE_TAG}" >> $GITHUB_OUTPUT
+          echo "date=${DATE_TAG}" >> $GITHUB_OUTPUT
+
+      - name: Commit Compiled Dataset & TOC
+        run: |
+          git config --local user.name "MarketSync Compiler"
+          git config --local user.email "compiler@marketsync.local"
+          git add MarketSyncData/ dist/compile-summary.json
+          git commit -m "chore(release): compile daily dataset pack (${{ steps.vars.outputs.date }}) [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: "MarketSyncData ${{ steps.vars.outputs.date }}"
+          body: |
+            ## MarketSyncData Daily Auction Pack (${{ steps.vars.outputs.date }})
+            
+            Compiled daily baseline auction house pricing data for World of Warcraft: Forever.
+            
+            - **Data Format**: Pre-compiled Base-36 pricing tables for instant offline browsing.
+            - **Auto-Sync**: Automatically ingested into MarketSync on login.
+            - **Compatibility**: Targets Interface 16001 (Forever), 11509 (Classic Era), and 120001 (Modern).
+            
+            ### Installation:
+            Extract `MarketSyncData.zip` into your `World of Warcraft/_forever_/Interface/AddOns/` directory alongside `MarketSync`.
+          files: |
+            dist/MarketSyncData.zip
+            dist/compile-summary.json
+
+      - name: Upload to CurseForge (Optional)
+        if: env.CURSEFORGE_TOKEN != '' && env.CURSEFORGE_PROJECT_ID != ''
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ secrets.CURSEFORGE_PROJECT_ID }}
+        run: |
+          echo "CurseForge token found. Submitting release to CurseForge API..."
+          # Uses CurseForge Upload API if secrets are configured
+          METADATA=$(cat <<EOF
+          {
+            "changelog": "Daily compiled auction pricing data pack for ${{ steps.vars.outputs.date }}.",
+            "changelogType": "markdown",
+            "releaseType": "release",
+            "gameVersions": [116001, 11509]
+          }
+          EOF
+          )
+          curl -s -X POST "https://wow.curseforge.com/api/projects/${CURSEFORGE_PROJECT_ID}/upload-file" \
+            -H "x-api-token: ${CURSEFORGE_TOKEN}" \
+            -F "metadata=${METADATA}" \
+            -F "file=@dist/MarketSyncData.zip" || true

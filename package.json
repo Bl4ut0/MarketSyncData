@@ -1,0 +1,25 @@
+{
+  "name": "marketsyncdata",
+  "version": "1.0.0",
+  "description": "Automated World of Warcraft Auction House data harvester and daily compilation pipeline for MarketSync",
+  "main": "scripts/compile.js",
+  "scripts": {
+    "harvest": "node scripts/harvest.js",
+    "compile": "node scripts/compile.js",
+    "package": "node scripts/package.js",
+    "test": "node tests/test_pipeline.js"
+  },
+  "keywords": [
+    "world-of-warcraft",
+    "marketsync",
+    "auction-house",
+    "blizzard-api",
+    "forever",
+    "economy"
+  ],
+  "author": "MarketSync Team",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@pinta365/blizzard_api": "^0.8.7"
+  }
+}

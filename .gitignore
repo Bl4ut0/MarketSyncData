@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment / Credentials
+.env
+.env.local
+*.pem
+credentials.json
+
+# Temporary & Output Builds
+dist/
+*.zip
+*.log
+
+# Large Raw Archives (optional cache)
+datasets/raw/
+tmp/
+.cache/
+
+# OS specific
+.DS_Store
+Thumbs.db

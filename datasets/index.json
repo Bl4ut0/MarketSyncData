@@ -1,0 +1,14 @@
+{
+  "blocks": [
+    {
+      "date": "2026-11-22",
+      "hour": "07",
+      "path": "datasets/2026-11-22/07-00.json",
+      "items": 6,
+      "volume": 537,
+      "timestamp": 1795333449,
+      "simulated": true
+    }
+  ],
+  "lastUpdated": "2026-11-22T07:44:09.023Z"
+}

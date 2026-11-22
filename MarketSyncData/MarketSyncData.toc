@@ -1,0 +1,13 @@
+## Interface: 16001, 120001, 120000, 50503, 38000, 20506, 20505, 11509, 11508
+## Title: MarketSyncData
+## Notes: Daily compiled auction data pack for MarketSync.
+## Author: MarketSync Team
+## Version: 2026.11.22
+## OptionalDeps: MarketSync
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## X-Category: Auction & Economy
+## X-Part-Of: MarketSync
+
+Core.lua
+MarketSyncData.lua

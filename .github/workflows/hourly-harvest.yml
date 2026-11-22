@@ -1,0 +1,49 @@
+name: Hourly Auction Harvester
+
+on:
+  schedule:
+    # Run at the top of every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: harvest-group
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    name: Harvest Hourly Auction Block
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Harvest Hourly Dataset Block
+        env:
+          BLIZZARD_REGION: 'us'
+          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
+          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
+        run: npm run harvest
+
+      - name: Commit Hourly Dataset Block
+        run: |
+          git config --local user.name "MarketSync Harvester"
+          git config --local user.email "harvester@marketsync.local"
+          git add datasets/
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git commit -m "chore(data): record hourly auction dataset block ($TIMESTAMP) [skip ci]" || echo "No changes to commit"
+          git push
