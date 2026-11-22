@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "flavor": "anniversary",
+  "timestamp": 1795368065,
+  "isoDate": "2026-11-22T17:21:05.078Z",
+  "region": "us",
+  "rulesets": {
+    "dreamscythe": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "nightslayer": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "maladath": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    }
+  },
+  "stats": {
+    "totalItems": 0,
+    "totalVolume": 0,
+    "status": "live"
+  }
+}

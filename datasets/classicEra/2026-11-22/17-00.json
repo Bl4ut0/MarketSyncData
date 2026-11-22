@@ -1,0 +1,129 @@
+{
+  "version": "1.0",
+  "flavor": "classicEra",
+  "timestamp": 1795368065,
+  "isoDate": "2026-11-22T17:21:05.078Z",
+  "region": "us",
+  "rulesets": {
+    "remulos": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "whitemane": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "arugal": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "doomhowl": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "skull-rock": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "grobbulus": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "atiesh": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "loatheb": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulthraze": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "defias-pillager": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulfuras": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "bloodsail-buccaneers": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "faerlina": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "deviate-delight": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "mankrik": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "wild-growth": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lone-wolf": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "living-flame": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "crusader-strike": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "penance-au": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "shadowstrike-au": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lava-lash": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "chaos-bolt": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    }
+  },
+  "stats": {
+    "totalItems": 0,
+    "totalVolume": 0,
+    "status": "live"
+  }
+}
