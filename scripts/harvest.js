@@ -155,6 +155,26 @@ function resolveHouseName(house) {
   return (house && house.name) || 'Faction';
 }
 
+const FOREVER_RULESET_HOUSES = {
+  1: { Alliance: 110, Horde: 113, Neutral: 116 },  // PvP
+  2: { Alliance: 111, Horde: 114, Neutral: 117 },  // Normal
+  3: { Alliance: 119, Horde: 120, Neutral: 121 },  // Roleplay
+  15: { Alliance: 123, Horde: 124, Neutral: 125 }, // Roleplay PvP
+};
+
+function mergeAggregatedMaps(target, source) {
+  for (const [key, entry] of Object.entries(source)) {
+    if (!target[key]) {
+      target[key] = entry;
+    } else {
+      if (entry.minPrice < target[key].minPrice) target[key].minPrice = entry.minPrice;
+      if (entry.maxPrice > target[key].maxPrice) target[key].maxPrice = entry.maxPrice;
+      target[key].totalQty += entry.totalQty;
+      target[key].listings += entry.listings;
+    }
+  }
+}
+
 async function harvestForever(client, unixNow) {
   const partitions = {};
   let totalItems = 0;
@@ -174,23 +194,42 @@ async function harvestForever(client, unixNow) {
 
     if (!partitions[canonicalName]) partitions[canonicalName] = {};
 
-    const housesResp = await client.wowForever.auctionHouses(rsId);
-    for (const house of (housesResp.auctions || [])) {
-      const houseId = house.id;
-      const houseName = resolveHouseName(house);
+    const mappedHouses = FOREVER_RULESET_HOUSES[rsId];
+    if (mappedHouses) {
+      for (const [houseName, houseId] of Object.entries(mappedHouses)) {
+        let auctions = [];
+        let commodities = [];
+        try { auctions = (await client.wowForever.auctionHouse(rsId, houseId)).auctions || []; } catch {}
+        try { commodities = (await client.wowForever.auctionHouseCommodities(rsId, houseId)).auctions || []; } catch {}
 
-      let auctions = [];
-      let commodities = [];
-      try { auctions = (await client.wowForever.auctionHouse(rsId, houseId)).auctions || []; } catch {}
-      try { commodities = (await client.wowForever.auctionHouseCommodities(rsId, houseId)).auctions || []; } catch {}
+        const aggregated = aggregateAuctionListings(auctions, commodities, unixNow);
+        partitions[canonicalName][houseName] = aggregated;
 
-      const aggregated = aggregateAuctionListings(auctions, commodities, unixNow);
-      partitions[canonicalName][houseName] = aggregated;
+        const count = Object.keys(aggregated).length;
+        totalItems += count;
+        totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
+        console.log(`  [Forever] ${canonicalName}@${houseName} (house ${houseId}): ${count} unique items`);
+      }
+    } else {
+      const housesResp = await client.wowForever.auctionHouses(rsId);
+      for (const house of (housesResp.auctions || [])) {
+        const houseId = house.id;
+        const houseName = resolveHouseName(house);
 
-      const count = Object.keys(aggregated).length;
-      totalItems += count;
-      totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
-      console.log(`  [Forever] ${canonicalName}@${houseName}: ${count} unique items`);
+        let auctions = [];
+        let commodities = [];
+        try { auctions = (await client.wowForever.auctionHouse(rsId, houseId)).auctions || []; } catch {}
+        try { commodities = (await client.wowForever.auctionHouseCommodities(rsId, houseId)).auctions || []; } catch {}
+
+        const aggregated = aggregateAuctionListings(auctions, commodities, unixNow);
+        if (!partitions[canonicalName][houseName]) partitions[canonicalName][houseName] = {};
+        mergeAggregatedMaps(partitions[canonicalName][houseName], aggregated);
+
+        const count = Object.keys(aggregated).length;
+        totalItems += count;
+        totalVolume += Object.values(aggregated).reduce((s, i) => s + i.totalQty, 0);
+        console.log(`  [Forever] ${canonicalName}@${houseName} (house ${houseId}): ${count} unique items`);
+      }
     }
   }
 

@@ -2,8 +2,8 @@ name: Daily Dataset Compile & Release
 
 on:
   schedule:
-    # Run once daily at 06:00 UTC (matching Raider.IO & Oribos Exchange standards)
-    - cron: '0 6 * * *'
+    # Run once daily at 06:20 UTC (off-peak minute to avoid top-of-hour runner queues)
+    - cron: '20 6 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -52,7 +52,7 @@ jobs:
           git config --local user.name "MarketSync Compiler"
           git config --local user.email "compiler@marketsync.local"
           git add MarketSyncData/ dist/compile-summary.json
-          git commit -m "chore(release): compile daily dataset pack (${{ steps.vars.outputs.date }}) [skip ci]" || echo "No changes to commit"
+          git commit -m "chore(release): compile daily dataset pack (${{ steps.vars.outputs.date }})" || echo "No changes to commit"
           git push
 
       - name: Create GitHub Release

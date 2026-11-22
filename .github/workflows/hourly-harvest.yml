@@ -2,8 +2,8 @@ name: Hourly Auction Harvester
 
 on:
   schedule:
-    # Run at the top of every hour
-    - cron: '0 * * * *'
+    # Off-peak minutes (:12 with a :42 backup retry if GitHub delays/drops :12 under load)
+    - cron: '12,42 * * * *'
   workflow_dispatch:
 
 concurrency:
@@ -23,15 +23,29 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Check Current UTC Hour Status
+        id: check
+        run: |
+          HOUR_FILE="datasets/forever/$(date -u +%Y-%m-%d)/$(date -u +%H)-00.json"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "$HOUR_FILE" ]; then
+            echo "Current UTC hour already harvested ($HOUR_FILE); skipping retry."
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Node.js
+        if: steps.check.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install Dependencies
+        if: steps.check.outputs.should_run == 'true'
         run: npm ci || npm install
 
       - name: Harvest Hourly Dataset Block
+        if: steps.check.outputs.should_run == 'true'
         env:
           BLIZZARD_REGION: 'us'
           BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
@@ -39,10 +53,11 @@ jobs:
         run: npm run harvest
 
       - name: Commit Hourly Dataset Block
+        if: steps.check.outputs.should_run == 'true'
         run: |
           git config --local user.name "MarketSync Harvester"
           git config --local user.email "harvester@marketsync.local"
           git add datasets/
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git commit -m "chore(data): record hourly auction dataset block ($TIMESTAMP) [skip ci]" || echo "No changes to commit"
+          git commit -m "chore(data): record hourly auction dataset block ($TIMESTAMP)" || echo "No changes to commit"
           git push
