@@ -17,7 +17,47 @@
       "volume": 49410483,
       "timestamp": 1795336513,
       "simulated": false
+    },
+    {
+      "flavor": "forever",
+      "date": "2026-11-22",
+      "hour": "08",
+      "path": "datasets/forever/2026-11-22/08-00.json",
+      "items": 403824,
+      "volume": 49410483,
+      "timestamp": 1795337354,
+      "simulated": false
+    },
+    {
+      "flavor": "classicEra",
+      "date": "2026-11-22",
+      "hour": "08",
+      "path": "datasets/classicEra/2026-11-22/08-00.json",
+      "items": 0,
+      "volume": 0,
+      "timestamp": 1795337354,
+      "simulated": false
+    },
+    {
+      "flavor": "classic",
+      "date": "2026-11-22",
+      "hour": "08",
+      "path": "datasets/classic/2026-11-22/08-00.json",
+      "items": 6155,
+      "volume": 15998,
+      "timestamp": 1795337354,
+      "simulated": false
+    },
+    {
+      "flavor": "retail",
+      "date": "2026-11-22",
+      "hour": "08",
+      "path": "datasets/retail/2026-11-22/08-00.json",
+      "items": 9774,
+      "volume": 33598078,
+      "timestamp": 1795337354,
+      "simulated": false
     }
   ],
-  "lastUpdated": "2026-11-22T08:35:13.506Z"
+  "lastUpdated": "2026-11-22T08:49:14.900Z"
 }

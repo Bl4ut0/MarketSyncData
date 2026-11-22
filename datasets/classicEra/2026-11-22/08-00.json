@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "flavor": "classicEra",
+  "timestamp": 1795337354,
+  "isoDate": "2026-11-22T08:49:14.900Z",
+  "region": "us",
+  "rulesets": {
+    "remulos": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "whitemane": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "arugal": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "doomhowl": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "skull-rock": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "grobbulus": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "atiesh": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "loatheb": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulthraze": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "defias-pillager": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulfuras": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "bloodsail-buccaneers": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "faerlina": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "deviate-delight": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "mankrik": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "wild-growth": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lone-wolf": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "living-flame": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "crusader-strike": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "penance-au": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "shadowstrike-au": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lava-lash": {
+      "Horde": {},
+      "Neutral": {}
+    },
+    "chaos-bolt": {
+      "Horde": {},
+      "Neutral": {}
+    }
+  },
+  "stats": {
+    "totalItems": 0,
+    "totalVolume": 0,
+    "status": "live"
+  }
+}
