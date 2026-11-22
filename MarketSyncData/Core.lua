@@ -24,6 +24,10 @@ end
 
 -- Safely inject compiled dataset into MarketSync's active database
 function MSD.InjectIntoMarketSync()
+    if MSD.injected then
+        return true, 0, 0
+    end
+
     if not MarketSync or not MarketSync.GetRealmDB then
         return false, "MarketSync core is not loaded"
     end
@@ -31,30 +35,57 @@ function MSD.InjectIntoMarketSync()
     local realmDB = MarketSync.GetRealmDB()
     if not realmDB then return false, "No active realm partition" end
 
-    -- Determine partition key (e.g. "english@Horde", "english@Alliance")
-    local partitionKey = MarketSync.GetFactionRealmKey and MarketSync.GetFactionRealmKey()
-    if not partitionKey and MarketSync.GetSyncMarketRealm then
-        partitionKey = MarketSync.GetSyncMarketRealm()
+    -- Determine realm safely (handling Lua's truthy empty strings)
+    local realm = (GetNormalizedRealmName and GetNormalizedRealmName()) or nil
+    if not realm or realm == "" then
+        realm = (GetRealmName and GetRealmName()) or nil
     end
-    if not partitionKey then
-        local realm = GetNormalizedRealmName and GetNormalizedRealmName() or GetRealmName()
-        local faction = UnitFactionGroup and UnitFactionGroup("player") or "Unknown"
-        partitionKey = tostring(realm) .. "@" .. tostring(faction)
+    if not realm or realm == "" then
+        realm = MarketSync.myRealm or nil
     end
 
-    local data = MarketSyncDataDB[partitionKey]
+    -- Determine faction safely
+    local faction = (MarketSync.GetPlayerMarketFaction and MarketSync.GetPlayerMarketFaction()) or nil
+    if not faction or faction == "Unknown" then
+        faction = (UnitFactionGroup and UnitFactionGroup("player")) or "Horde"
+    end
+
+    -- 1. Try exact partitionKey: "<realm>@<faction>"
+    local data = nil
+    if realm and realm ~= "" then
+        data = MarketSyncDataDB[realm .. "@" .. faction]
+        
+        -- 2. Try normalized realm (e.g. "English 52" -> "english@Horde")
+        if not data and MarketSync.NormalizeSyncRealm then
+            local normRealm = MarketSync.NormalizeSyncRealm(realm)
+            if normRealm and normRealm ~= "" then
+                data = MarketSyncDataDB[normRealm .. "@" .. faction]
+            end
+        end
+    end
+
+    -- 3. If still not found (or realm was empty/unresolved), find matching faction partition in MarketSyncDataDB
     if not data then
-        -- Also check normalized key without shard numbers (e.g., "english@Horde")
-        if MarketSync.NormalizeSyncRealm then
-            local rawRealm, faction = partitionKey:match("^(.+)@([^@]+)$")
-            local normRealm = MarketSync.NormalizeSyncRealm(rawRealm)
-            local altKey = (normRealm or rawRealm) .. "@" .. (faction or "Unknown")
-            data = MarketSyncDataDB[altKey]
+        for key, pData in pairs(MarketSyncDataDB or {}) do
+            if type(key) == "string" and key:find("@" .. faction .. "$") then
+                data = pData
+                break
+            end
+        end
+    end
+
+    -- 4. If still not found, check if there's any single partition in MarketSyncDataDB
+    if not data then
+        for _, pData in pairs(MarketSyncDataDB or {}) do
+            if type(pData) == "table" and next(pData) then
+                data = pData
+                break
+            end
         end
     end
 
     if not data or type(data) ~= "table" then
-        return false, "No data available for partition: " .. tostring(partitionKey)
+        return false, "No data available for faction: " .. tostring(faction)
     end
 
     if not realmDB.GuildData then realmDB.GuildData = {} end
@@ -68,7 +99,7 @@ function MSD.InjectIntoMarketSync()
             guildData[itemKey] = {
                 m = tonumber(entry.m) or 0,
                 q = tonumber(entry.q) or 1,
-                t = tonumber(entry.t) or time(),
+                t = tonumber(entry.t) or (time and time() or 0),
                 src = "DataPack"
             }
             inserted = inserted + 1
@@ -80,6 +111,10 @@ function MSD.InjectIntoMarketSync()
     -- Invalidate index cache so Browse and Search reflect the fresh data
     if inserted > 0 and MarketSync.InvalidateIndexCache then
         MarketSync.InvalidateIndexCache()
+    end
+
+    if inserted > 0 then
+        MSD.injected = true
     end
 
     return true, inserted, skipped
