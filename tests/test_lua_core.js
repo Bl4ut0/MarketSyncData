@@ -1,4 +1,4 @@
-const { lua, lauxlib, lualib, to_luastring } = require('../../MarketSync/node_modules/fengari');
+const { lua, lauxlib, lualib, to_luastring } = require('fengari');
 const fs = require('fs');
 const path = require('path');
 const L = lauxlib.luaL_newstate();

@@ -24,7 +24,7 @@ const FLAVORS = (process.env.HARVEST_FLAVORS || 'forever,anniversary,classicEra,
   .filter(Boolean);
 const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '90', 10);
 
-const DATASETS_DIR = path.join(__dirname, '../datasets');
+const DATASETS_DIR = process.env.DATASETS_DIR || path.join(__dirname, '../datasets');
 const INDEX_FILE = path.join(DATASETS_DIR, 'index.json');
 
 if (!fs.existsSync(DATASETS_DIR)) {

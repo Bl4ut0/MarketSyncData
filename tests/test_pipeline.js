@@ -5,6 +5,13 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
+
+const TEST_DATASETS_DIR = path.join(__dirname, '../dist/test-datasets');
+if (fs.existsSync(TEST_DATASETS_DIR)) {
+  fs.rmSync(TEST_DATASETS_DIR, { recursive: true, force: true });
+}
+process.env.DATASETS_DIR = TEST_DATASETS_DIR;
+
 const { harvest, aggregateAuctionListings } = require('../scripts/harvest');
 const { compileAll } = require('../scripts/compile');
 const { packageAll } = require('../scripts/package');
@@ -65,6 +72,9 @@ async function runTests() {
   }
   console.log(`  [PASS] Packager built all 5 MSData-<Flavor>-${expectedDate}.zip archives.`);
 
+  if (fs.existsSync(TEST_DATASETS_DIR)) {
+    fs.rmSync(TEST_DATASETS_DIR, { recursive: true, force: true });
+  }
   console.log('\nAll multi-flavor pipeline integration tests passed successfully!\n');
 }
 

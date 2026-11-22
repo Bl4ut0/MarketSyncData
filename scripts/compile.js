@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATASETS_DIR = path.join(__dirname, '../datasets');
+const DATASETS_DIR = process.env.DATASETS_DIR || path.join(__dirname, '../datasets');
 const ADDON_DIR = path.join(__dirname, '../MarketSyncData');
 const DIST_DIR = path.join(__dirname, '../dist');
 const BUILDS_DIR = path.join(DIST_DIR, 'builds');
