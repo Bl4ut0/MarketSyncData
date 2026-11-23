@@ -11,7 +11,7 @@ const STATIC_NAMESPACES = {
 const QUALITIES = ['POOR', 'COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'ARTIFACT', 'HEIRLOOM'];
 const RANGE_SIZE = 1000;
 const MAX_RANGES_PER_HARVEST = 120;
-const MAX_ITEM_REQUESTS_PER_HARVEST = 80;
+const MAX_ITEM_REQUESTS_PER_HARVEST = 2000;
 
 function englishName(value) {
   return typeof value === 'string' ? value : value?.en_US ?? value?.en_GB;
@@ -50,8 +50,8 @@ function observedItemIds(partitions) {
 }
 
 async function runBatches(values, fn) {
-  for (let index = 0; index < values.length; index += 5) {
-    await Promise.all(values.slice(index, index + 5).map(fn));
+  for (let index = 0; index < values.length; index += 15) {
+    await Promise.all(values.slice(index, index + 15).map(fn));
   }
 }
 
