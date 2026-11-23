@@ -33,7 +33,8 @@ local FLAVOR_INTERFACES = {
 local function IsClientFlavorCompatible(packFlavor)
     if not packFlavor or packFlavor == "" then return true end
     if not GetBuildInfo then return true end
-    local interface = tonumber(select(4, GetBuildInfo()))
+    local rawInterface = select(4, GetBuildInfo())
+    local interface = tonumber(rawInterface)
     if not interface then return true end
     local allowed = FLAVOR_INTERFACES[packFlavor]
     if not allowed then return true end
