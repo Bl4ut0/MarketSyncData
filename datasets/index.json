@@ -407,7 +407,57 @@
       "volume": 33023500,
       "timestamp": 1795392307,
       "simulated": false
+    },
+    {
+      "flavor": "forever",
+      "date": "2026-11-23",
+      "hour": "03",
+      "path": "datasets/forever/2026-11-23/03-00.json",
+      "items": 103304,
+      "volume": 13265347,
+      "timestamp": 1795405316,
+      "simulated": false
+    },
+    {
+      "flavor": "anniversary",
+      "date": "2026-11-23",
+      "hour": "03",
+      "path": "datasets/anniversary/2026-11-23/03-00.json",
+      "items": 0,
+      "volume": 0,
+      "timestamp": 1795405316,
+      "simulated": false
+    },
+    {
+      "flavor": "classicEra",
+      "date": "2026-11-23",
+      "hour": "03",
+      "path": "datasets/classicEra/2026-11-23/03-00.json",
+      "items": 0,
+      "volume": 0,
+      "timestamp": 1795405316,
+      "simulated": false
+    },
+    {
+      "flavor": "classic",
+      "date": "2026-11-23",
+      "hour": "03",
+      "path": "datasets/classic/2026-11-23/03-00.json",
+      "items": 6521,
+      "volume": 17412,
+      "timestamp": 1795405316,
+      "simulated": false
+    },
+    {
+      "flavor": "retail",
+      "date": "2026-11-23",
+      "hour": "03",
+      "path": "datasets/retail/2026-11-23/03-00.json",
+      "items": 9836,
+      "volume": 30259142,
+      "timestamp": 1795405316,
+      "simulated": false
     }
   ],
-  "lastUpdated": "2026-11-23T00:05:07.801Z"
+  "lastUpdated": "2026-11-23T03:41:56.736Z"
 }
