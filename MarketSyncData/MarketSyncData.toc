@@ -2,7 +2,7 @@
 ## Title: MarketSyncData
 ## Notes: Daily compiled auction data pack for MarketSync.
 ## Author: MarketSync Team
-## Version: 2026.11.22
+## Version: 2026.11.23
 ## OptionalDeps: MarketSync
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
