@@ -66,11 +66,11 @@ async function updateItemCatalog({ client, flavor, region, partitions, datasetsD
   const items = { ...previous.items };
   const missing = { ...previous.missing };
   const today = now.toISOString().slice(0, 10);
-  const unresolved = observed.filter((id) => !items[id] && missing[id] !== today);
+  const unresolved = observed.filter((id) => !items[id]?.name && missing[id] !== today);
   if (!unresolved.length) return;
 
   const wanted = new Set(unresolved);
-  const countsBefore = Object.keys(items).length;
+  let enriched = 0;
   const origin = `https://${region}.api.blizzard.com`;
   const namespaceQuery = `namespace=${namespace}-${region}`;
   const ranges = [...new Set(unresolved.map((id) => Math.floor((id - 1) / RANGE_SIZE) * RANGE_SIZE + 1))]
@@ -90,6 +90,7 @@ async function updateItemCatalog({ client, flavor, region, partitions, datasetsD
       const item = compactItem(data);
       if (item) {
         items[data.id] = item;
+        enriched += 1;
         delete missing[data.id];
       }
     }
@@ -106,21 +107,24 @@ async function updateItemCatalog({ client, flavor, region, partitions, datasetsD
     console.warn(`[Catalog] ${flavor} item search unavailable (${reason}); trying individual item records.`);
   }
 
-  await runBatches(unresolved.filter((id) => !items[id]).slice(0, MAX_ITEM_REQUESTS_PER_HARVEST), async (id) => {
+  await runBatches(unresolved.filter((id) => !items[id]?.name).slice(0, MAX_ITEM_REQUESTS_PER_HARVEST), async (id) => {
     try {
       const item = compactItem(await client.requestHref(`${origin}/data/wow/item/${id}?${namespaceQuery}`));
-      if (item) items[id] = item;
-      else missing[id] = today;
+      if (item) {
+        items[id] = item;
+        enriched += 1;
+        delete missing[id];
+      } else missing[id] = today;
     } catch (error) {
       if (error?.statusCode === 404) missing[id] = today;
     }
   });
 
-  const resolved = observed.filter((id) => items[id]).length;
-  console.log(`[Catalog] ${flavor}: ${resolved}/${observed.length} observed IDs have Blizzard item metadata (+${Object.keys(items).length - countsBefore} this run).`);
-  if (Object.keys(items).length === countsBefore && JSON.stringify(missing) === JSON.stringify(previous.missing ?? {})) return;
+  const resolved = observed.filter((id) => items[id]?.name).length;
+  console.log(`[Catalog] ${flavor}: ${resolved}/${observed.length} observed IDs have item names (+${enriched} this run).`);
+  if (!enriched && JSON.stringify(missing) === JSON.stringify(previous.missing ?? {})) return;
   fs.mkdirSync(directory, { recursive: true });
-  fs.writeFileSync(output, JSON.stringify({ version: 1, flavor, items, missing }) + '\n', 'utf8');
+  fs.writeFileSync(output, JSON.stringify({ ...previous, version: 1, flavor, items, missing }) + '\n', 'utf8');
 }
 
 module.exports = { compactItem, updateItemCatalog };
