@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "flavor": "classicEra",
-  "timestamp": 1795482368,
-  "isoDate": "2026-11-24T01:06:08.888Z",
+  "timestamp": 1795482790,
+  "isoDate": "2026-11-24T01:13:10.555Z",
   "region": "us",
   "rulesets": {
     "remulos": {
@@ -210,7 +210,7 @@
         "status": "unavailable",
         "upstreamListings": 0,
         "errors": [
-          "HTTP 404"
+          "request failed"
         ]
       }
     },
