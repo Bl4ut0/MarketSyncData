@@ -10,6 +10,10 @@ on:
         description: Read Blizzard and report results without publishing datasets
         type: boolean
         default: false
+      analytics_only:
+        description: Publish analytics from existing captures without requesting Blizzard data
+        type: boolean
+        default: false
 
 concurrency:
   group: harvest-group
@@ -32,8 +36,12 @@ jobs:
         id: check
         env:
           EVENT_NAME: ${{ github.event_name }}
+          ANALYTICS_ONLY: ${{ inputs.analytics_only }}
         run: |
-          if [ "$EVENT_NAME" = "schedule" ] && node scripts/check-hour.js; then
+          if [ "$ANALYTICS_ONLY" = "true" ]; then
+            echo "Using existing captures for analytics."
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          elif [ "$EVENT_NAME" = "schedule" ] && node scripts/check-hour.js; then
             echo "All editions have a usable capture for this UTC hour."
             echo "should_run=false" >> $GITHUB_OUTPUT
           else
@@ -41,7 +49,6 @@ jobs:
           fi
 
       - name: Setup Node.js
-        if: steps.check.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -60,8 +67,13 @@ jobs:
           DATASETS_DIR: ${{ inputs.diagnostic_only && format('{0}/marketsync-diagnostic', runner.temp) || '' }}
         run: npm run harvest
 
+      - name: Publish Market Analytics Reports
+        if: '!inputs.diagnostic_only'
+        continue-on-error: true
+        run: node scripts/prepare-analytics.js
+
       - name: Commit Hourly Dataset Block
-        if: steps.check.outputs.should_run == 'true' && !inputs.diagnostic_only
+        if: '!inputs.diagnostic_only'
         run: |
           git config --local user.name "MarketSync Harvester"
           git config --local user.email "harvester@marketsync.local"

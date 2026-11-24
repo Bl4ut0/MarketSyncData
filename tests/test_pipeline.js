@@ -20,6 +20,7 @@ const { harvest, harvestFactionRealms, aggregateAuctionListings } = require('../
 const { updateItemCatalog } = require('../scripts/catalog');
 const { compileAll } = require('../scripts/compile');
 const { packageAll } = require('../scripts/package');
+const { prepareAnalytics } = require('../scripts/prepare-analytics');
 
 async function runTests() {
   console.log('=== Running MarketSync DataSync Multi-Flavor Pipeline Tests ===');
@@ -52,6 +53,48 @@ async function runTests() {
   assert.strictEqual(aggregated['82800:159'].listings, 1);
   assert.strictEqual(aggregated['2447:-1'].minPrice, 1);
   console.log('  [PASS] Listing aggregation passed.');
+
+  const analyticsDir = path.join(TEST_ROOT, 'analytics-fixture');
+  const date = '2026-11-23';
+  const dateDir = path.join(analyticsDir, 'forever', date);
+  fs.mkdirSync(dateDir, { recursive: true });
+  const captures = Array.from({ length: 14 }, (_, i) => {
+    const hour = String(i).padStart(2, '0');
+    const timestamp = 1795392000 + i * 3600;
+    const simulated = i === 13;
+    fs.writeFileSync(path.join(dateDir, `${hour}-00.json`), JSON.stringify({
+      flavor: 'forever',
+      timestamp,
+      stats: { status: simulated ? 'simulated' : 'live' },
+      rulesets: { pvp: { Alliance: aggregated } },
+    }));
+    return {
+      flavor: 'forever', date, hour, path: `datasets/forever/${date}/${hour}-00.json`,
+      timestamp, simulated, items: Object.keys(aggregated).length, volume: 100,
+    };
+  });
+  const analyticsIndex = path.join(analyticsDir, 'index.json');
+  fs.writeFileSync(analyticsIndex, JSON.stringify({ blocks: captures }));
+  assert.strictEqual(prepareAnalytics(analyticsDir), 1);
+  const indexed = JSON.parse(fs.readFileSync(analyticsIndex, 'utf8')).blocks;
+  const manifest = indexed[12].analytics;
+  assert.deepStrictEqual(manifest.partitions.map(({ key, factions }) => [key, factions]), [['pvp', ['Alliance']]]);
+  assert.strictEqual(indexed[0].analytics, undefined);
+  assert.strictEqual(indexed[13].analytics, undefined);
+  for (const hours of [24, 168, 720]) {
+    const report = JSON.parse(fs.readFileSync(path.join(
+      analyticsDir, 'analytics', 'v2', 'forever', manifest.revision, 'pvp', 'Alliance', `${hours}.json`
+    ), 'utf8'));
+    assert.equal(report.timestamp, captures[12].timestamp);
+    assert.equal(report.views.all.macro.sampledCaptures, 8);
+    const flower = report.items.find(({ row }) => row.itemKey === '2447');
+    assert.equal(flower.row.totalQty, 50);
+    assert.equal(flower.baselineQty, 50);
+    assert.equal(flower.row.minPrice, 1);
+    assert.ok(report.items.some(({ row }) => row.itemKey === '82800:159'));
+  }
+  assert.strictEqual(prepareAnalytics(analyticsDir), 0);
+  console.log('  [PASS] Published three analytics windows with variant totals and live captures.');
 
   const mockClient = {
     async requestHref(href) {
