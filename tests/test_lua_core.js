@@ -15,10 +15,13 @@ run(`
   function GetNormalizedRealmName() return "" end
   function GetRealmName() return "" end
   function UnitFactionGroup() return "Horde" end
+  function GetBuildInfo() return "1.60.1", "71037", "Nov 2026", 16001 end
   function CreateFrame() return { RegisterEvent = function() end, SetScript = function() end } end
   function time() return 1795324800 end
+  MarketSyncDB = {}
   MarketSync = {
     GetRealmDB = function() return { GuildData = {} } end,
+    GetForeverAuctionRuleset = function() return "english" end,
     NormalizeSyncRealm = function(r) return r end,
     InvalidateIndexCache = function() end
   }
@@ -30,8 +33,9 @@ run(`
 const coreLua = fs.readFileSync(path.join(__dirname, '../MarketSyncData/Core.lua'), 'utf8');
 run(coreLua);
 run(`
+  MarketSyncData.flavor = "forever"
   local ok, inserted, skipped = MarketSyncData.InjectIntoMarketSync()
-  assert(ok == true, "Inject should succeed even when realm name is empty string")
+  assert(ok == true, "Inject should succeed even when realm name is empty string: " .. tostring(inserted))
   assert(inserted == 1, "Should have inserted 1 item matching faction")
   print("Fengari Lua test passed! Inserted: " .. inserted)
 `);
