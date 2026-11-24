@@ -43,89 +43,58 @@ local function IsClientFlavorCompatible(packFlavor)
     return false, interface
 end
 
--- Safely inject compiled dataset into MarketSync's active database
-function MSD.InjectIntoMarketSync()
-    if MSD.injected then
-        return true, 0, 0
-    end
-
+function MSD.GetCurrentMarketPrices()
     local compat, iface = IsClientFlavorCompatible(MSD.flavor)
     if not compat then
-        return false, string.format("DataPack flavor '%s' does not match client interface %s", tostring(MSD.flavor), tostring(iface))
+        return nil, nil, string.format("DataPack flavor '%s' does not match client interface %s", tostring(MSD.flavor), tostring(iface))
     end
+    local realm = MarketSync and MarketSync.GetAuctionRealm and MarketSync.GetAuctionRealm()
+        or (GetNormalizedRealmName and GetNormalizedRealmName())
+    if not realm or realm == "" then
+        realm = GetRealmName and GetRealmName()
+    end
+    local faction = UnitFactionGroup and UnitFactionGroup("player")
+    if MSD.flavor == "forever" and MarketSync and MarketSync.GetForeverAuctionRuleset then
+        realm = MarketSync.GetForeverAuctionRuleset() or realm
+    elseif MSD.flavor == "retail" then
+        realm, faction = "region", "Commodities"
+    elseif MSD.flavor == "classic" then
+        faction = "CrossFaction"
+    end
+    if not realm or realm == "" or (faction ~= "Alliance" and faction ~= "Horde"
+        and faction ~= "CrossFaction" and faction ~= "Commodities") then
+        return nil, nil, "The current auction market is unavailable"
+    end
+    local suffix = "@" .. faction
+    local slug = realm:lower():gsub("[%s']", "")
+    local prices = MarketSyncDataDB[realm .. suffix] or MarketSyncDataDB[slug .. suffix]
+    return prices, realm .. " / " .. faction
+end
 
-    if not MarketSync or not MarketSync.GetRealmDB then
+function MSD.InjectIntoMarketSync()
+    if not MarketSync or not MarketSync.GetRealmDB or not MarketSyncDB then
         return false, "MarketSync core is not loaded"
     end
-
-    local realmDB = MarketSync.GetRealmDB()
-    if not realmDB then return false, "No active realm partition" end
-
-    -- Determine realm safely (handling Lua's truthy empty strings)
-    local realm = (GetNormalizedRealmName and GetNormalizedRealmName()) or nil
-    if not realm or realm == "" then
-        realm = (GetRealmName and GetRealmName()) or nil
-    end
-    if not realm or realm == "" then
-        realm = MarketSync.myRealm or nil
-    end
-
-    -- Determine faction safely
-    local faction = (MarketSync.GetPlayerMarketFaction and MarketSync.GetPlayerMarketFaction()) or nil
-    if not faction or faction == "Unknown" then
-        faction = (UnitFactionGroup and UnitFactionGroup("player")) or "Horde"
-    end
-
-    -- 1. Try exact partitionKey: "<realm>@<faction>"
-    local data = nil
-    if realm and realm ~= "" then
-        data = MarketSyncDataDB[realm .. "@" .. faction]
-        
-        -- 2. Try normalized realm (e.g. "English 52" -> "english@Horde")
-        if not data and MarketSync.NormalizeSyncRealm then
-            local normRealm = MarketSync.NormalizeSyncRealm(realm)
-            if normRealm and normRealm ~= "" then
-                data = MarketSyncDataDB[normRealm .. "@" .. faction]
-            end
-        end
-    end
-
-    -- 3. If still not found (or realm was empty/unresolved), find matching faction partition in MarketSyncDataDB
-    if not data then
-        for key, pData in pairs(MarketSyncDataDB or {}) do
-            if type(key) == "string" and key:find("@" .. faction .. "$") then
-                data = pData
-                break
-            end
-        end
-    end
-
-    -- 4. If still not found, check if there's any single partition in MarketSyncDataDB
-    if not data then
-        for _, pData in pairs(MarketSyncDataDB or {}) do
-            if type(pData) == "table" and next(pData) then
-                data = pData
-                break
-            end
-        end
-    end
-
+    local data, market, reason = MSD.GetCurrentMarketPrices()
     if not data or type(data) ~= "table" then
-        return false, "No data available for faction: " .. tostring(faction)
+        return false, reason or ("No data available for " .. tostring(market))
     end
-
-    if not realmDB.GuildData then realmDB.GuildData = {} end
+    local realmDB = MarketSync.GetRealmDB()
+    if not realmDB or not realmDB.GuildData then return false, "No active realm partition" end
     local guildData = realmDB.GuildData
+    if MSD.importedInto == guildData and MSD.importedMarket == market then return true, 0, 0 end
     local inserted, skipped = 0, 0
 
     for itemKey, entry in pairs(data) do
         local existing = guildData[itemKey]
-        -- Only insert or update if existing entry is missing or older
-        if not existing or (entry.t and (tonumber(existing.t) or 0) < tonumber(entry.t)) then
+        local timestamp = tonumber(entry.t) or 0
+        local fromPack = existing and existing.src == "DataPack"
+            and (not existing.source or existing.source == "Web" or existing.source == "DataPack")
+        if not existing or (fromPack and timestamp > (tonumber(existing.t) or 0)) then
             guildData[itemKey] = {
                 m = tonumber(entry.m) or 0,
                 q = tonumber(entry.q) or 1,
-                t = tonumber(entry.t) or (time and time() or 0),
+                t = timestamp,
                 src = "DataPack"
             }
             inserted = inserted + 1
@@ -139,36 +108,28 @@ function MSD.InjectIntoMarketSync()
         MarketSync.InvalidateIndexCache()
     end
 
-    if inserted > 0 then
-        MSD.injected = true
-    end
+    MSD.importedInto, MSD.importedMarket = guildData, market
 
     return true, inserted, skipped
 end
 
--- Frame listener to trigger ingestion on login or when MarketSync loads
+-- Frame listener to trigger ingestion on login, /reload, or when MarketSync loads
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-frame:SetScript("OnEvent", function(self, event, arg1)
-    if event == "ADDON_LOADED" then
-        if arg1 == ADDON_NAME or arg1 == "MarketSync" then
-            if MarketSync and MarketSync.GetRealmDB then
-                local ok, count = MSD.InjectIntoMarketSync()
-                if ok and count and count > 0 then
-                    Log(string.format("Loaded %d daily auction price observations.", count))
-                end
-            end
-        end
-    elseif event == "PLAYER_LOGIN" then
-        C_Timer.After(2.0, function()
-            if MarketSync and MarketSync.GetRealmDB then
-                local ok, count = MSD.InjectIntoMarketSync()
-                if ok and count and count > 0 then
-                    Log(string.format("Synced %d baseline auction prices into MarketSync.", count))
-                end
-            end
-        end)
+local function ImportPrices()
+    local ok, count = MSD.InjectIntoMarketSync()
+    if ok and count > 0 then
+        Log(string.format("Loaded %d daily auction price observations.", count))
+    end
+end
+
+frame:SetScript("OnEvent", function(_, event, arg1)
+    if event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD"
+        or (event == "ADDON_LOADED" and IsLoggedIn and IsLoggedIn()
+            and (arg1 == ADDON_NAME or arg1 == "MarketSync")) then
+        C_Timer.After(2, ImportPrices)
     end
 end)
