@@ -3,7 +3,7 @@ name: Daily Dataset Compile & Release
 on:
   schedule:
     # Run once daily at 06:20 UTC (off-peak minute to avoid top-of-hour runner queues)
-    - cron: '20 6 * * *'
+    - cron: '27 6 * * *'
   workflow_dispatch:
 
 concurrency:
