@@ -2116,52 +2116,7 @@
       "items": 98878,
       "volume": 13390356,
       "timestamp": 1795568747,
-      "simulated": false,
-      "analytics": {
-        "revision": "d055cfacf21f253cbc340f13",
-        "partitions": [
-          {
-            "key": "pvp",
-            "label": "PvP",
-            "entryCount": 33579,
-            "factions": [
-              "Alliance",
-              "Horde",
-              "Neutral"
-            ]
-          },
-          {
-            "key": "roleplaypvp",
-            "label": "Roleplay PvP",
-            "entryCount": 17135,
-            "factions": [
-              "Alliance",
-              "Horde",
-              "Neutral"
-            ]
-          },
-          {
-            "key": "roleplay",
-            "label": "Roleplay",
-            "entryCount": 15172,
-            "factions": [
-              "Alliance",
-              "Horde",
-              "Neutral"
-            ]
-          },
-          {
-            "key": "normal",
-            "label": "Normal",
-            "entryCount": 32992,
-            "factions": [
-              "Alliance",
-              "Horde",
-              "Neutral"
-            ]
-          }
-        ]
-      }
+      "simulated": false
     },
     {
       "flavor": "anniversary",
@@ -2171,30 +2126,7 @@
       "items": 0,
       "volume": 0,
       "timestamp": 1795568747,
-      "simulated": false,
-      "analytics": {
-        "revision": "220e71ea8d21e8a337528f8b",
-        "partitions": [
-          {
-            "key": "dreamscythe",
-            "label": "Dreamscythe",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "nightslayer",
-            "label": "Nightslayer",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "maladath",
-            "label": "Maladath (AU)",
-            "entryCount": 0,
-            "factions": []
-          }
-        ]
-      }
+      "simulated": false
     },
     {
       "flavor": "classicEra",
@@ -2204,150 +2136,7 @@
       "items": 0,
       "volume": 0,
       "timestamp": 1795568747,
-      "simulated": false,
-      "analytics": {
-        "revision": "fecb9c522f93c7b2335c80fb",
-        "partitions": [
-          {
-            "key": "remulos",
-            "label": "Remulos",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "whitemane",
-            "label": "Whitemane",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "arugal",
-            "label": "Arugal",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "doomhowl",
-            "label": "Doomhowl",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "skull-rock",
-            "label": "Skull Rock",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "grobbulus",
-            "label": "Grobbulus",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "atiesh",
-            "label": "Atiesh",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "loatheb",
-            "label": "Loatheb",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "sulthraze",
-            "label": "Sulthraze",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "defias-pillager",
-            "label": "Defias Pillager",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "sulfuras",
-            "label": "Sulfuras",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "bloodsail-buccaneers",
-            "label": "Bloodsail Buccaneers",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "faerlina",
-            "label": "Faerlina",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "deviate-delight",
-            "label": "Deviate Delight",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "mankrik",
-            "label": "Mankrik",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "wild-growth",
-            "label": "Wild Growth",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "lone-wolf",
-            "label": "Lone Wolf",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "living-flame",
-            "label": "Living Flame",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "crusader-strike",
-            "label": "Crusader Strike",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "penance-au",
-            "label": "Penance (AU)",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "shadowstrike-au",
-            "label": "Shadowstrike (AU)",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "lava-lash",
-            "label": "Lava Lash",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "chaos-bolt",
-            "label": "Chaos Bolt",
-            "entryCount": 0,
-            "factions": []
-          }
-        ]
-      }
+      "simulated": false
     },
     {
       "flavor": "classic",
@@ -2357,176 +2146,7 @@
       "items": 6148,
       "volume": 16206,
       "timestamp": 1795568747,
-      "simulated": false,
-      "analytics": {
-        "revision": "dff18d19537e6a33a9640a83",
-        "partitions": [
-          {
-            "key": "atiesh",
-            "label": "Atiesh",
-            "entryCount": 285,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "myzrael",
-            "label": "Myzrael",
-            "entryCount": 10,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "old-blanchy",
-            "label": "Old Blanchy",
-            "entryCount": 7,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "azuresong",
-            "label": "Azuresong",
-            "entryCount": 4,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "mankrik",
-            "label": "Mankrik",
-            "entryCount": 176,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "pagle",
-            "label": "Pagle",
-            "entryCount": 5355,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "ashkandi",
-            "label": "Ashkandi",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "westfall",
-            "label": "Westfall",
-            "entryCount": 33,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "whitemane",
-            "label": "Whitemane",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "faerlina",
-            "label": "Faerlina",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "grobbulus",
-            "label": "Grobbulus",
-            "entryCount": 5,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "bloodsail-buccaneers",
-            "label": "Bloodsail Buccaneers",
-            "entryCount": 76,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "remulos-au",
-            "label": "Remulos (AU)",
-            "entryCount": 50,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "arugal-au",
-            "label": "Arugal (AU)",
-            "entryCount": 135,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "yojamba-au",
-            "label": "Yojamba (AU)",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "skyfury",
-            "label": "Skyfury",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "sulfuras",
-            "label": "Sulfuras",
-            "entryCount": 5,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "windseeker",
-            "label": "Windseeker",
-            "entryCount": 7,
-            "factions": [
-              "CrossFaction"
-            ]
-          },
-          {
-            "key": "benediction",
-            "label": "Benediction",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "earthfury",
-            "label": "Earthfury",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "maladath",
-            "label": "Maladath",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "angerforge",
-            "label": "Angerforge",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
-            "key": "eranikus",
-            "label": "Eranikus",
-            "entryCount": 0,
-            "factions": []
-          }
-        ]
-      }
+      "simulated": false
     },
     {
       "flavor": "retail",
@@ -2536,20 +2156,7 @@
       "items": 9591,
       "volume": 41019609,
       "timestamp": 1795568747,
-      "simulated": false,
-      "analytics": {
-        "revision": "f57723e8add3c8bb1db3e551",
-        "partitions": [
-          {
-            "key": "region",
-            "label": "Region-Wide",
-            "entryCount": 9591,
-            "factions": [
-              "Commodities"
-            ]
-          }
-        ]
-      }
+      "simulated": false
     },
     {
       "flavor": "forever",
@@ -2985,7 +2592,442 @@
           }
         ]
       }
+    },
+    {
+      "flavor": "forever",
+      "date": "2026-11-25",
+      "hour": "03",
+      "path": "datasets/forever/2026-11-25/03-00.json",
+      "items": 101423,
+      "volume": 13715802,
+      "timestamp": 1795575953,
+      "simulated": false,
+      "analytics": {
+        "revision": "507b40c84984082cf545de4c",
+        "partitions": [
+          {
+            "key": "pvp",
+            "label": "PvP",
+            "entryCount": 34294,
+            "factions": [
+              "Alliance",
+              "Horde",
+              "Neutral"
+            ]
+          },
+          {
+            "key": "roleplaypvp",
+            "label": "Roleplay PvP",
+            "entryCount": 17580,
+            "factions": [
+              "Alliance",
+              "Horde",
+              "Neutral"
+            ]
+          },
+          {
+            "key": "roleplay",
+            "label": "Roleplay",
+            "entryCount": 15505,
+            "factions": [
+              "Alliance",
+              "Horde",
+              "Neutral"
+            ]
+          },
+          {
+            "key": "normal",
+            "label": "Normal",
+            "entryCount": 34044,
+            "factions": [
+              "Alliance",
+              "Horde",
+              "Neutral"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "flavor": "anniversary",
+      "date": "2026-11-25",
+      "hour": "03",
+      "path": "datasets/anniversary/2026-11-25/03-00.json",
+      "items": 0,
+      "volume": 0,
+      "timestamp": 1795575953,
+      "simulated": false,
+      "analytics": {
+        "revision": "ba1fdbe59dc451078f6daa77",
+        "partitions": [
+          {
+            "key": "dreamscythe",
+            "label": "Dreamscythe",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "nightslayer",
+            "label": "Nightslayer",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "maladath",
+            "label": "Maladath (AU)",
+            "entryCount": 0,
+            "factions": []
+          }
+        ]
+      }
+    },
+    {
+      "flavor": "classicEra",
+      "date": "2026-11-25",
+      "hour": "03",
+      "path": "datasets/classicEra/2026-11-25/03-00.json",
+      "items": 0,
+      "volume": 0,
+      "timestamp": 1795575953,
+      "simulated": false,
+      "analytics": {
+        "revision": "4ca21f70d7b6284dc4becc5f",
+        "partitions": [
+          {
+            "key": "remulos",
+            "label": "Remulos",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "whitemane",
+            "label": "Whitemane",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "arugal",
+            "label": "Arugal",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "doomhowl",
+            "label": "Doomhowl",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "skull-rock",
+            "label": "Skull Rock",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "grobbulus",
+            "label": "Grobbulus",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "atiesh",
+            "label": "Atiesh",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "loatheb",
+            "label": "Loatheb",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "sulthraze",
+            "label": "Sulthraze",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "defias-pillager",
+            "label": "Defias Pillager",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "sulfuras",
+            "label": "Sulfuras",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "bloodsail-buccaneers",
+            "label": "Bloodsail Buccaneers",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "faerlina",
+            "label": "Faerlina",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "deviate-delight",
+            "label": "Deviate Delight",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "mankrik",
+            "label": "Mankrik",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "wild-growth",
+            "label": "Wild Growth",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "lone-wolf",
+            "label": "Lone Wolf",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "living-flame",
+            "label": "Living Flame",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "crusader-strike",
+            "label": "Crusader Strike",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "penance-au",
+            "label": "Penance (AU)",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "shadowstrike-au",
+            "label": "Shadowstrike (AU)",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "lava-lash",
+            "label": "Lava Lash",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "chaos-bolt",
+            "label": "Chaos Bolt",
+            "entryCount": 0,
+            "factions": []
+          }
+        ]
+      }
+    },
+    {
+      "flavor": "classic",
+      "date": "2026-11-25",
+      "hour": "03",
+      "path": "datasets/classic/2026-11-25/03-00.json",
+      "items": 6219,
+      "volume": 16514,
+      "timestamp": 1795575953,
+      "simulated": false,
+      "analytics": {
+        "revision": "b83d0e9c6bfc66020ec16a54",
+        "partitions": [
+          {
+            "key": "atiesh",
+            "label": "Atiesh",
+            "entryCount": 329,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "myzrael",
+            "label": "Myzrael",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "old-blanchy",
+            "label": "Old Blanchy",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "azuresong",
+            "label": "Azuresong",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "mankrik",
+            "label": "Mankrik",
+            "entryCount": 73,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "pagle",
+            "label": "Pagle",
+            "entryCount": 5472,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "ashkandi",
+            "label": "Ashkandi",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "westfall",
+            "label": "Westfall",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "whitemane",
+            "label": "Whitemane",
+            "entryCount": 2,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "faerlina",
+            "label": "Faerlina",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "grobbulus",
+            "label": "Grobbulus",
+            "entryCount": 1,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "bloodsail-buccaneers",
+            "label": "Bloodsail Buccaneers",
+            "entryCount": 82,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "remulos-au",
+            "label": "Remulos (AU)",
+            "entryCount": 118,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "arugal-au",
+            "label": "Arugal (AU)",
+            "entryCount": 137,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "yojamba-au",
+            "label": "Yojamba (AU)",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "skyfury",
+            "label": "Skyfury",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "sulfuras",
+            "label": "Sulfuras",
+            "entryCount": 5,
+            "factions": [
+              "CrossFaction"
+            ]
+          },
+          {
+            "key": "windseeker",
+            "label": "Windseeker",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "benediction",
+            "label": "Benediction",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "earthfury",
+            "label": "Earthfury",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "maladath",
+            "label": "Maladath",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "angerforge",
+            "label": "Angerforge",
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "eranikus",
+            "label": "Eranikus",
+            "entryCount": 0,
+            "factions": []
+          }
+        ]
+      }
+    },
+    {
+      "flavor": "retail",
+      "date": "2026-11-25",
+      "hour": "03",
+      "path": "datasets/retail/2026-11-25/03-00.json",
+      "items": 9598,
+      "volume": 41082152,
+      "timestamp": 1795575953,
+      "simulated": false,
+      "analytics": {
+        "revision": "3152f35fa682d90e3f53faa5",
+        "partitions": [
+          {
+            "key": "region",
+            "label": "Region-Wide",
+            "entryCount": 9598,
+            "factions": [
+              "Commodities"
+            ]
+          }
+        ]
+      }
     }
   ],
-  "lastUpdated": "2026-11-25T02:05:58.081Z"
+  "lastUpdated": "2026-11-25T03:05:53.103Z"
 }
