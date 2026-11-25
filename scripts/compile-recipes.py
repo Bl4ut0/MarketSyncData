@@ -145,6 +145,7 @@ def compile_catalog(directory, flavor, build):
 
     items = {}
     vendor_prices = {}
+    sell_prices = {}
     for row in rows(directory, "ItemSparse"):
         item = integer(row, "ID")
         if item not in item_ids:
@@ -154,7 +155,10 @@ def compile_catalog(directory, flavor, build):
             items[item] = name
         price = integer(row, "BuyPrice")
         if item in VENDOR_REAGENTS and price > 0:
-            vendor_prices[item] = price // max(1, integer(row, "BuyCount"))
+            vendor_prices[item] = price // max(1, integer(row.get("BuyCount") and row or {}, "BuyCount") or 1)
+        sell = integer(row, "SellPrice")
+        if sell > 0:
+            sell_prices[item] = sell
 
     verified = []
     for recipe in recipes:
@@ -168,6 +172,7 @@ def compile_catalog(directory, flavor, build):
     published_items = {
         item for recipe in verified for item in [recipe["itemId"], *(item for item, _ in recipe["reagents"])]
     }
+    output_items = {recipe["itemId"] for recipe in verified}
     professions = [
         {"id": skill, "name": skills[skill]["DisplayName_lang"], "recipeCount": counts[skill],
          "unsupportedCount": unsupported[skill]}
@@ -176,7 +181,8 @@ def compile_catalog(directory, flavor, build):
     return {"version": 1, "flavor": flavor, "build": build,
             "professions": sorted(professions, key=lambda record: record["name"]),
             "recipes": verified, "items": {item: name for item, name in items.items() if item in published_items},
-            "vendorPrices": {item: price for item, price in vendor_prices.items() if item in published_items}}
+            "vendorPrices": {item: price for item, price in vendor_prices.items() if item in published_items},
+            "sellPrices": {item: price for item, price in sell_prices.items() if item in output_items}}
 
 
 def main():
