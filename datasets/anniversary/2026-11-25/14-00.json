@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "flavor": "anniversary",
+  "timestamp": 1795615556,
+  "isoDate": "2026-11-25T14:05:56.683Z",
+  "region": "us",
+  "rulesets": {
+    "dreamscythe": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "nightslayer": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "maladath": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    }
+  },
+  "markets": {
+    "dreamscythe": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "nightslayer": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "maladath": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    }
+  },
+  "stats": {
+    "totalItems": 0,
+    "totalVolume": 0,
+    "status": "live"
+  }
+}
