@@ -2648,17 +2648,17 @@
       "date": "2026-11-25",
       "hour": "04",
       "path": "datasets/forever/2026-11-25/04-00.json",
-      "items": 102825,
-      "volume": 13942055,
-      "timestamp": 1795579557,
+      "items": 104556,
+      "volume": 13870911,
+      "timestamp": 1795581278,
       "simulated": false,
       "analytics": {
-        "revision": "12e9d792cdd9cd096400c48f",
+        "revision": "4fa0ce6d4f944541064801e4",
         "partitions": [
           {
             "key": "pvp",
             "label": "PvP",
-            "entryCount": 34760,
+            "entryCount": 35329,
             "factions": [
               "Alliance",
               "Horde",
@@ -2668,7 +2668,7 @@
           {
             "key": "roleplaypvp",
             "label": "Roleplay PvP",
-            "entryCount": 17902,
+            "entryCount": 18314,
             "factions": [
               "Alliance",
               "Horde",
@@ -2678,7 +2678,7 @@
           {
             "key": "roleplay",
             "label": "Roleplay",
-            "entryCount": 15663,
+            "entryCount": 16034,
             "factions": [
               "Alliance",
               "Horde",
@@ -2688,7 +2688,7 @@
           {
             "key": "normal",
             "label": "Normal",
-            "entryCount": 34500,
+            "entryCount": 34879,
             "factions": [
               "Alliance",
               "Horde",
@@ -2705,10 +2705,10 @@
       "path": "datasets/anniversary/2026-11-25/04-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795579557,
+      "timestamp": 1795581278,
       "simulated": false,
       "analytics": {
-        "revision": "7186874987c8f458c1b2eeb0",
+        "revision": "cf429321649a245be8444a04",
         "partitions": [
           {
             "key": "dreamscythe",
@@ -2738,10 +2738,10 @@
       "path": "datasets/classicEra/2026-11-25/04-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795579557,
+      "timestamp": 1795581278,
       "simulated": false,
       "analytics": {
-        "revision": "0a764fc8e50a84d5f8659433",
+        "revision": "2b309671cf40f9d5552dac14",
         "partitions": [
           {
             "key": "remulos",
@@ -2889,12 +2889,12 @@
       "date": "2026-11-25",
       "hour": "04",
       "path": "datasets/classic/2026-11-25/04-00.json",
-      "items": 6313,
-      "volume": 16757,
-      "timestamp": 1795579557,
+      "items": 6207,
+      "volume": 16671,
+      "timestamp": 1795581278,
       "simulated": false,
       "analytics": {
-        "revision": "bca45018fef635e28fea1cf5",
+        "revision": "b78b1b3f1151054143bf7f1c",
         "partitions": [
           {
             "key": "atiesh",
@@ -2907,8 +2907,10 @@
           {
             "key": "myzrael",
             "label": "Myzrael",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 10,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "old-blanchy",
@@ -2935,7 +2937,7 @@
           {
             "key": "pagle",
             "label": "Pagle",
-            "entryCount": 5426,
+            "entryCount": 5483,
             "factions": [
               "CrossFaction"
             ]
@@ -2943,38 +2945,36 @@
           {
             "key": "ashkandi",
             "label": "Ashkandi",
-            "entryCount": 3,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "westfall",
             "label": "Westfall",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 2,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "whitemane",
             "label": "Whitemane",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 2,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "faerlina",
             "label": "Faerlina",
-            "entryCount": 4,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "grobbulus",
             "label": "Grobbulus",
-            "entryCount": 5,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "bloodsail-buccaneers",
@@ -2987,7 +2987,7 @@
           {
             "key": "remulos-au",
             "label": "Remulos (AU)",
-            "entryCount": 157,
+            "entryCount": 2,
             "factions": [
               "CrossFaction"
             ]
@@ -2995,7 +2995,7 @@
           {
             "key": "arugal-au",
             "label": "Arugal (AU)",
-            "entryCount": 137,
+            "entryCount": 124,
             "factions": [
               "CrossFaction"
             ]
@@ -3021,7 +3021,7 @@
           {
             "key": "windseeker",
             "label": "Windseeker",
-            "entryCount": 7,
+            "entryCount": 10,
             "factions": [
               "CrossFaction"
             ]
@@ -3064,17 +3064,17 @@
       "date": "2026-11-25",
       "hour": "04",
       "path": "datasets/retail/2026-11-25/04-00.json",
-      "items": 9606,
-      "volume": 41669338,
-      "timestamp": 1795579557,
+      "items": 9623,
+      "volume": 40219842,
+      "timestamp": 1795581278,
       "simulated": false,
       "analytics": {
-        "revision": "afe42eda2c76dba6433fa775",
+        "revision": "30707fd060741de532e8e05a",
         "partitions": [
           {
             "key": "region",
             "label": "Region-Wide",
-            "entryCount": 9606,
+            "entryCount": 9623,
             "factions": [
               "Commodities"
             ]
@@ -3083,5 +3083,5 @@
       }
     }
   ],
-  "lastUpdated": "2026-11-25T04:05:57.537Z"
+  "lastUpdated": "2026-11-25T04:34:38.597Z"
 }
