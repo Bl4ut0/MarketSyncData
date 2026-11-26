@@ -1,0 +1,660 @@
+{
+  "version": "1.0",
+  "flavor": "classicEra",
+  "timestamp": 1795673139,
+  "isoDate": "2026-11-26T06:05:39.326Z",
+  "region": "us",
+  "rulesets": {
+    "remulos": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "whitemane": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "arugal": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "doomhowl": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "skull-rock": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "grobbulus": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "atiesh": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "loatheb": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulthraze": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "defias-pillager": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "sulfuras": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "bloodsail-buccaneers": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "faerlina": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "deviate-delight": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "mankrik": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "wild-growth": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lone-wolf": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "living-flame": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "crusader-strike": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "penance-au": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "shadowstrike-au": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "lava-lash": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    },
+    "chaos-bolt": {
+      "Alliance": {},
+      "Horde": {},
+      "Neutral": {}
+    }
+  },
+  "markets": {
+    "remulos": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "whitemane": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "arugal": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "doomhowl": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "skull-rock": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "grobbulus": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "atiesh": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "loatheb": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "sulthraze": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "defias-pillager": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "sulfuras": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "bloodsail-buccaneers": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "faerlina": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "deviate-delight": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "mankrik": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "wild-growth": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "lone-wolf": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "living-flame": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "crusader-strike": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "penance-au": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "shadowstrike-au": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "lava-lash": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    },
+    "chaos-bolt": {
+      "Alliance": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Horde": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      },
+      "Neutral": {
+        "status": "unavailable",
+        "upstreamListings": 0,
+        "errors": [
+          "HTTP 404"
+        ]
+      }
+    }
+  },
+  "stats": {
+    "totalItems": 0,
+    "totalVolume": 0,
+    "status": "live"
+  }
+}
