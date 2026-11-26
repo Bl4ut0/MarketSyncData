@@ -1448,6 +1448,28 @@ function groupAuctionVariants(rows) {
 }
 
 // client/src/lib/marketAnalytics.ts
+var OUTLIER_MAX_LISTINGS = 2;
+var OUTLIER_MIN_SHARE = 0.1;
+var OUTLIER_MIN_RATIO = 5;
+function findMarketOutliers(entries, value, listings, total) {
+  const sorted = [...entries].sort((a, b) => value(b) - value(a));
+  const outliers = [];
+  let remaining = total;
+  for (let i = 0; i < sorted.length; i += 1) {
+    const current = sorted[i];
+    const next = sorted[i + 1];
+    const worth = value(current);
+    if (listings(current) > OUTLIER_MAX_LISTINGS) break;
+    if (!(worth > OUTLIER_MIN_SHARE * remaining)) break;
+    if (next !== void 0 && worth < OUTLIER_MIN_RATIO * value(next)) break;
+    outliers.push(current);
+    remaining -= worth;
+  }
+  return outliers;
+}
+function analyticsCategoryOf(row) {
+  return row.ahCategory ?? (row.isFallback && !row.isPetCage ? "unclassified" : "miscellaneous");
+}
 function indexMarketObservations(timestamp, entries) {
   const exact = /* @__PURE__ */ Object.create(null);
   const grouped = /* @__PURE__ */ Object.create(null);
@@ -1475,6 +1497,21 @@ function medianOf(nums) {
   return sorted.length % 2 === 1 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 var MAX_ANALYTICS_CAPTURES = 8;
+var MIN_VOLATILITY_OBSERVATIONS = 3;
+function priceVolatilityPct(prices) {
+  if (prices.length < MIN_VOLATILITY_OBSERVATIONS) return null;
+  let sum = 0;
+  let min = Number.POSITIVE_INFINITY;
+  let max = 0;
+  for (const price of prices) {
+    sum += price;
+    if (price < min) min = price;
+    if (price > max) max = price;
+  }
+  const mean = sum / prices.length;
+  if (!(mean > 0)) return null;
+  return Math.round((max - min) / mean * 1e3) / 10;
+}
 function analyzeMarket(groupedRows, samples, flavor) {
   const uniqueByTs = /* @__PURE__ */ new Map();
   for (const sample of samples) {
@@ -1489,11 +1526,30 @@ function analyzeMarket(groupedRows, samples, flavor) {
   catLabelMap.set("miscellaneous", "Miscellaneous");
   catLabelMap.set("unclassified", "Unclassified");
   const catAgg = /* @__PURE__ */ new Map();
+  const rowValue = (row) => row.minPrice * Math.max(1, row.totalQty);
+  const outlierRows = findMarketOutliers(
+    groupedRows,
+    rowValue,
+    (row) => row.listings,
+    groupedRows.reduce((sum, row) => sum + rowValue(row), 0)
+  );
+  const outlierKeys = new Set(outlierRows.map((row) => row.itemKey));
+  const excludedOutliers = outlierRows.map((row) => ({
+    itemKey: row.itemKey,
+    itemId: row.itemId,
+    name: row.name,
+    category: analyticsCategoryOf(row),
+    minPrice: row.minPrice,
+    totalQty: row.totalQty,
+    listings: row.listings,
+    marketValueCopper: rowValue(row)
+  }));
   const allItems = [];
   const byCategory = /* @__PURE__ */ new Map();
   for (const row of groupedRows) {
-    const catId = row.ahCategory ?? (row.isFallback && !row.isPetCage ? "unclassified" : "miscellaneous");
-    const mktVal = row.minPrice * Math.max(1, row.totalQty);
+    if (outlierKeys.has(row.itemKey)) continue;
+    const catId = analyticsCategoryOf(row);
+    const mktVal = rowValue(row);
     const prices = [];
     const qtys = [];
     const grouped = row.variants && row.variants.length > 1;
@@ -1515,7 +1571,8 @@ function analyzeMarket(groupedRows, samples, flavor) {
     const baselinePrice = Math.max(1, medianOf(priorPrices));
     const rawPct = observations > 1 && baselinePrice > 0 ? (row.minPrice - baselinePrice) / baselinePrice * 100 : 0;
     const priceChangePct = Math.round(rawPct * 10) / 10;
-    const dealPctOfAvg = Math.round(row.minPrice / windowMedianPrice * 100);
+    const dealPctOfMedian = Math.round(row.minPrice / windowMedianPrice * 100);
+    const volatilityPct = priceVolatilityPct(prices);
     let variance = 0;
     if (observations > 1 && windowAvgPrice > 0) {
       for (const p of prices) {
@@ -1565,7 +1622,8 @@ function analyzeMarket(groupedRows, samples, flavor) {
       windowMedianPrice,
       baselinePrice,
       priceChangePct,
-      dealPctOfAvg,
+      dealPctOfMedian,
+      volatilityPct,
       volatilityCv: Math.round(volatilityCv * 1e3) / 1e3,
       stabilityScore,
       baselineQty,
@@ -1592,11 +1650,15 @@ function analyzeMarket(groupedRows, samples, flavor) {
       category === "all" ? allItems : byCategory.get(category) ?? [],
       sampledCaptures,
       categories,
-      flavor
+      flavor,
+      category === "all" ? excludedOutliers : excludedOutliers.filter((o) => o.category === category)
     )
   };
 }
-function summarizeMarket(allItems, sampledCaptures, categories, flavor) {
+function volumeMoverScore(item) {
+  return item.row.totalQty * Math.log10(Math.max(10, item.row.minPrice));
+}
+function summarizeMarket(allItems, sampledCaptures, categories, flavor, excludedOutliers = []) {
   let totalMarketValue = 0;
   let totalUnits = 0;
   let totalListings = 0;
@@ -1620,8 +1682,8 @@ function summarizeMarket(allItems, sampledCaptures, categories, flavor) {
   const gainers = [...pool].filter((it) => it.observations >= 2 && it.priceChangePct > 2).sort(
     (a, b) => Math.min(500, b.priceChangePct) - Math.min(500, a.priceChangePct) || b.marketValueCopper - a.marketValueCopper
   ).slice(0, 25);
-  const deals = [...pool].filter((it) => it.observations >= 2 && it.dealPctOfAvg <= 92 && it.priceChangePct < -2).sort(
-    (a, b) => a.dealPctOfAvg - b.dealPctOfAvg || b.marketValueCopper - a.marketValueCopper
+  const deals = [...pool].filter((it) => it.observations >= 2 && it.dealPctOfMedian <= 92 && it.priceChangePct < -2).sort(
+    (a, b) => a.dealPctOfMedian - b.dealPctOfMedian || b.marketValueCopper - a.marketValueCopper
   ).slice(0, 25);
   const stableMinObs = Math.max(1, Math.ceil(sampledCaptures * 0.6));
   const stableAnchors = [...pool].filter(
@@ -1630,7 +1692,7 @@ function summarizeMarket(allItems, sampledCaptures, categories, flavor) {
     (a, b) => b.stabilityScore - a.stabilityScore || a.volatilityCv - b.volatilityCv || b.marketValueCopper - a.marketValueCopper
   ).slice(0, 25);
   const volumeMovers = [...allItems].sort(
-    (a, b) => b.row.totalQty * Math.log10(Math.max(10, b.row.minPrice)) - a.row.totalQty * Math.log10(Math.max(10, a.row.minPrice)) || b.marketValueCopper - a.marketValueCopper
+    (a, b) => volumeMoverScore(b) - volumeMoverScore(a) || b.marketValueCopper - a.marketValueCopper
   ).slice(0, 25);
   const surfaced = /* @__PURE__ */ new Set();
   for (const list of [
@@ -1665,7 +1727,8 @@ function summarizeMarket(allItems, sampledCaptures, categories, flavor) {
     stableAnchors,
     volumeMovers,
     categories,
-    unhydratedItemIds: Array.from(surfaced).slice(0, 50)
+    unhydratedItemIds: Array.from(surfaced).slice(0, 50),
+    excludedOutliers
   };
 }
 
@@ -1724,6 +1787,7 @@ function packAnalyticsReport(timestamp, categories, view) {
     views[key] = {
       macro: payload.macro,
       unhydratedItemIds: payload.unhydratedItemIds,
+      excludedOutliers: payload.excludedOutliers ?? [],
       ...rankedLists
     };
   }
