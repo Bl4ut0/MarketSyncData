@@ -3848,17 +3848,17 @@
       "date": "2026-11-26",
       "hour": "05",
       "path": "datasets/forever/2026-11-26/05-00.json",
-      "items": 105924,
-      "volume": 13456336,
-      "timestamp": 1795669561,
+      "items": 107121,
+      "volume": 13592881,
+      "timestamp": 1795670807,
       "simulated": false,
       "analytics": {
-        "revision": "abe1dc39662652e18e0e350a",
+        "revision": "4933b98fa9a0d654bd7920d4",
         "partitions": [
           {
             "key": "pvp",
             "label": "PvP",
-            "entryCount": 35815,
+            "entryCount": 36185,
             "factions": [
               "Alliance",
               "Horde",
@@ -3868,7 +3868,7 @@
           {
             "key": "roleplaypvp",
             "label": "Roleplay PvP",
-            "entryCount": 18255,
+            "entryCount": 18359,
             "factions": [
               "Alliance",
               "Horde",
@@ -3878,7 +3878,7 @@
           {
             "key": "roleplay",
             "label": "Roleplay",
-            "entryCount": 16484,
+            "entryCount": 16649,
             "factions": [
               "Alliance",
               "Horde",
@@ -3888,7 +3888,7 @@
           {
             "key": "normal",
             "label": "Normal",
-            "entryCount": 35370,
+            "entryCount": 35928,
             "factions": [
               "Alliance",
               "Horde",
@@ -3905,10 +3905,10 @@
       "path": "datasets/anniversary/2026-11-26/05-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795669561,
+      "timestamp": 1795670807,
       "simulated": false,
       "analytics": {
-        "revision": "858bd610661f44789c553635",
+        "revision": "e7e77b6c95a7c33b833668c7",
         "partitions": [
           {
             "key": "dreamscythe",
@@ -3938,10 +3938,10 @@
       "path": "datasets/classicEra/2026-11-26/05-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795669561,
+      "timestamp": 1795670807,
       "simulated": false,
       "analytics": {
-        "revision": "f49b54bcb86d960699e19eb5",
+        "revision": "bbc5fa98ed6c5013fcfb8e56",
         "partitions": [
           {
             "key": "remulos",
@@ -4089,12 +4089,12 @@
       "date": "2026-11-26",
       "hour": "05",
       "path": "datasets/classic/2026-11-26/05-00.json",
-      "items": 6278,
-      "volume": 15821,
-      "timestamp": 1795669561,
+      "items": 6540,
+      "volume": 16106,
+      "timestamp": 1795670807,
       "simulated": false,
       "analytics": {
-        "revision": "11b6697265095f1b1cd784da",
+        "revision": "d14370097498e7b0ce119712",
         "partitions": [
           {
             "key": "atiesh",
@@ -4125,13 +4125,15 @@
           {
             "key": "mankrik",
             "label": "Mankrik",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 62,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "pagle",
             "label": "Pagle",
-            "entryCount": 5285,
+            "entryCount": 5334,
             "factions": [
               "CrossFaction"
             ]
@@ -4177,7 +4179,7 @@
           {
             "key": "remulos-au",
             "label": "Remulos (AU)",
-            "entryCount": 36,
+            "entryCount": 153,
             "factions": [
               "CrossFaction"
             ]
@@ -4185,7 +4187,7 @@
           {
             "key": "arugal-au",
             "label": "Arugal (AU)",
-            "entryCount": 141,
+            "entryCount": 175,
             "factions": [
               "CrossFaction"
             ]
@@ -4254,17 +4256,17 @@
       "date": "2026-11-26",
       "hour": "05",
       "path": "datasets/retail/2026-11-26/05-00.json",
-      "items": 9641,
-      "volume": 33661394,
-      "timestamp": 1795669561,
+      "items": 9656,
+      "volume": 35157421,
+      "timestamp": 1795670807,
       "simulated": false,
       "analytics": {
-        "revision": "8387f6e4b571d0ce7cbf05f0",
+        "revision": "80818996cf451b04bfdc21e9",
         "partitions": [
           {
             "key": "region",
             "label": "Region-Wide",
-            "entryCount": 9641,
+            "entryCount": 9656,
             "factions": [
               "Commodities"
             ]
@@ -4273,5 +4275,5 @@
       }
     }
   ],
-  "lastUpdated": "2026-11-26T05:06:01.701Z"
+  "lastUpdated": "2026-11-26T05:26:47.887Z"
 }
