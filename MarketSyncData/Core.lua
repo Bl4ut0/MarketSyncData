@@ -93,65 +93,18 @@ function MSD.GetCurrentMarketPrices()
     return prices, realm .. " / " .. faction
 end
 
+-- Price record for one item in this character's market, or nil. Loads this
+-- character's Forever pack the first time (load on demand).
+function MSD.GetPrice(itemKey)
+    local prices = MSD.GetCurrentMarketPrices()
+    local rec = type(prices) == "table" and itemKey ~= nil and prices[tostring(itemKey)]
+    return type(rec) == "table" and rec or nil
+end
+
+-- Pack rows are no longer copied into MarketSync's saved GuildData. Copies
+-- were shared by guild sync and uploads as if they were scans, and they kept
+-- the pack in memory twice. MarketSync reads the pack directly, only for
+-- items nobody has scanned. Kept as a no-op for older MarketSync versions.
 function MSD.InjectIntoMarketSync()
-    if not MarketSync or not MarketSync.GetRealmDB or not MarketSyncDB then
-        return false, "MarketSync core is not loaded"
-    end
-    local data, market, reason = MSD.GetCurrentMarketPrices()
-    if not data or type(data) ~= "table" then
-        return false, reason or ("No data available for " .. tostring(market))
-    end
-    local realmDB = MarketSync.GetRealmDB()
-    if not realmDB or not realmDB.GuildData then return false, "No active realm partition" end
-    local guildData = realmDB.GuildData
-    if MSD.importedInto == guildData and MSD.importedMarket == market then return true, 0, 0 end
-    local inserted, skipped = 0, 0
-
-    for itemKey, entry in pairs(data) do
-        local existing = guildData[itemKey]
-        local timestamp = tonumber(entry.t) or 0
-        local fromPack = existing and existing.src == "DataPack"
-            and (not existing.source or existing.source == "Web" or existing.source == "DataPack")
-        if not existing or (fromPack and timestamp > (tonumber(existing.t) or 0)) then
-            guildData[itemKey] = {
-                m = tonumber(entry.m) or 0,
-                q = tonumber(entry.q) or 1,
-                t = timestamp,
-                src = "DataPack"
-            }
-            inserted = inserted + 1
-        else
-            skipped = skipped + 1
-        end
-    end
-
-    -- Invalidate index cache so Browse and Search reflect the fresh data
-    if inserted > 0 and MarketSync.InvalidateIndexCache then
-        MarketSync.InvalidateIndexCache()
-    end
-
-    MSD.importedInto, MSD.importedMarket = guildData, market
-
-    return true, inserted, skipped
+    return true, 0, 0
 end
-
--- Frame listener to trigger ingestion on login, /reload, or when MarketSync loads
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("ADDON_LOADED")
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-local function ImportPrices()
-    local ok, count = MSD.InjectIntoMarketSync()
-    if ok and count > 0 then
-        Log(string.format("Loaded %d daily auction price observations.", count))
-    end
-end
-
-frame:SetScript("OnEvent", function(_, event, arg1)
-    if event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD"
-        or (event == "ADDON_LOADED" and IsLoggedIn and IsLoggedIn()
-            and (arg1 == ADDON_NAME or arg1 == "MarketSync")) then
-        C_Timer.After(2, ImportPrices)
-    end
-end)

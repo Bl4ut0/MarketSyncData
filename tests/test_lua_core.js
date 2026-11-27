@@ -34,8 +34,14 @@ const coreLua = fs.readFileSync(path.join(__dirname, '../MarketSyncData/Core.lua
 run(coreLua);
 run(`
   MarketSyncData.flavor = "forever"
-  local ok, inserted, skipped = MarketSyncData.InjectIntoMarketSync()
-  assert(ok == true, "Inject should succeed even when realm name is empty string: " .. tostring(inserted))
-  assert(inserted == 1, "Should have inserted 1 item matching faction")
-  print("Fengari Lua test passed! Inserted: " .. inserted)
+  -- Pack rows stay in the pack; nothing is copied into MarketSync's GuildData.
+  local guildData = {}
+  MarketSync.GetRealmDB = function() return { GuildData = guildData } end
+  local ok, inserted = MarketSyncData.InjectIntoMarketSync()
+  assert(ok == true and inserted == 0 and next(guildData) == nil, "The pack must not be copied into GuildData")
+  -- Lookups read the pack directly, even when the realm name is empty during early load.
+  local rec = MarketSyncData.GetPrice(13464)
+  assert(rec and rec.m == 12500, "GetPrice should read this character's market: " .. tostring(rec and rec.m))
+  assert(MarketSyncData.GetPrice(99999) == nil, "Unknown items have no pack price")
+  print("Fengari Lua test passed! Pack read directly, GuildData untouched.")
 `);
