@@ -43,6 +43,24 @@ local function IsClientFlavorCompatible(packFlavor)
     return false, interface
 end
 
+-- Each Forever pack is its own LoadOnDemand addon named MarketSyncData_Forever_<ruleset>_<faction>.
+-- Loading one is one-way until /reload, so only the character's own pack is loaded by default.
+function MSD.PackAddonName(ruleset, faction)
+    return "MarketSyncData_Forever_" .. tostring(ruleset) .. "_" .. tostring(faction)
+end
+
+-- Loads the pack for a ruleset and faction. Returns true when its data is available.
+function MSD.EnsureForeverPack(ruleset, faction)
+    if not ruleset or not faction then return false end
+    local name = MSD.PackAddonName(ruleset, faction)
+    local api = C_AddOns or {}
+    if api.IsAddOnLoaded and api.IsAddOnLoaded(name) then return true end
+    local load = api.LoadAddOn or LoadAddOn
+    if type(load) ~= "function" then return false end
+    pcall(load, name)
+    return api.IsAddOnLoaded and api.IsAddOnLoaded(name) == true or false
+end
+
 function MSD.GetCurrentMarketPrices()
     local compat, iface = IsClientFlavorCompatible(MSD.flavor)
     if not compat then
@@ -67,6 +85,10 @@ function MSD.GetCurrentMarketPrices()
     end
     local suffix = "@" .. faction
     local slug = realm:lower():gsub("[%s']", "")
+    if MSD.flavor == "forever" then
+        -- Forever packs are split per ruleset and faction. Load this character's pack first.
+        MSD.EnsureForeverPack(realm, faction)
+    end
     local prices = MarketSyncDataDB[realm .. suffix] or MarketSyncDataDB[slug .. suffix]
     return prices, realm .. " / " .. faction
 end

@@ -49,5 +49,21 @@ foreach ($p in $products) {
         }
         Copy-Item -Path "$source\*" -Destination $targetDir -Recurse -Force
         Write-Host "  -> Deployed $flavorLabel build successfully to $targetDir"
+
+        # Forever packs are separate LoadOnDemand addons. Drop the old single-file pack if it is still there.
+        if ($flavorLabel -eq "Forever") {
+            Remove-Item -Path "$targetDir\MarketSyncData.lua" -Force -ErrorAction SilentlyContinue
+            $packSource = "$buildsRoot\$flavorLabel\packs"
+            if (Test-Path $packSource) {
+                Get-ChildItem -Path $packSource -Directory | ForEach-Object {
+                    $packTarget = "$wowRoot\$p\Interface\AddOns\$($_.Name)"
+                    if (-not (Test-Path $packTarget)) {
+                        New-Item -ItemType Directory -Path $packTarget -Force | Out-Null
+                    }
+                    Copy-Item -Path "$($_.FullName)\*" -Destination $packTarget -Recurse -Force
+                    Write-Host "  -> Deployed pack $($_.Name)"
+                }
+            }
+        }
     }
 }

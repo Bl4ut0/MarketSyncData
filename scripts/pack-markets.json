@@ -1,0 +1,26 @@
+{
+  "$comment": "Market list for the data packs. One entry per pack family. A market with live: false is planned but has no data yet; the build must skip it and the addon must show it as not available. Turn a market on by setting live to true when its data exists. Pack keys follow docs/PACK_BREAKOUT.md.",
+  "forever": {
+    "unit": "ruleset-faction",
+    "neutralInEachFactionPack": true,
+    "factions": ["Alliance", "Horde"],
+    "markets": [
+      { "ruleset": "pvp", "live": true },
+      { "ruleset": "normal", "live": true },
+      { "ruleset": "roleplay", "live": true },
+      { "ruleset": "roleplaypvp", "live": true },
+      { "ruleset": "hardcore", "live": false, "note": "Launch pending. No data partition yet." }
+    ]
+  },
+  "classic": {
+    "unit": "connected-realm",
+    "live": true,
+    "note": "Connected-realm groups from the harvester's connectedRealms map. Groups are the battlegroup packs."
+  },
+  "retail": {
+    "unit": "region",
+    "regions": [
+      { "region": "us", "live": true }
+    ]
+  }
+}

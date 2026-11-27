@@ -1,0 +1,83 @@
+name: Forever data packs
+
+on:
+  schedule:
+    # After the daily compile window, so the packs use the latest committed datasets.
+    - cron: '10 7 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: forever-packs
+  cancel-in-progress: false
+
+jobs:
+  build-packs:
+    name: Build Forever packs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      pack_date: ${{ steps.vars.outputs.iso_date }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Run Pipeline Tests
+        run: npm test
+
+      - name: Compile Forever Packs
+        run: npm run compile
+
+      - name: Set Pack Date
+        id: vars
+        run: echo "iso_date=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Package Forever Pack Archives
+        run: node scripts/package.js "${{ steps.vars.outputs.iso_date }}"
+
+      - name: Save Pack Archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: forever-packs-${{ steps.vars.outputs.iso_date }}
+          path: dist/MarketSyncData_Forever_*.zip
+          if-no-files-found: error
+
+  upload-curseforge:
+    name: Upload Forever packs to CurseForge
+    needs: build-packs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download Pack Archives
+        uses: actions/download-artifact@v4
+        with:
+          name: forever-packs-${{ needs.build-packs.outputs.pack_date }}
+          path: dist
+
+      - name: Upload Packs
+        # Uses the repository's existing CurseForge secret. Projects without an ID are skipped,
+        # and the upload is skipped entirely when the secret is not set.
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: node scripts/upload-packs.js "${{ needs.build-packs.outputs.pack_date }}"

@@ -177,7 +177,20 @@ function captureMarket(result, partition, house, auctions, commodities = { rows:
 }
 
 function newHarvest() {
-  return { partitions: {}, markets: {}, totalItems: 0, totalVolume: 0 };
+  return { partitions: {}, markets: {}, connectedRealms: {}, totalItems: 0, totalVolume: 0 };
+}
+
+// Maps a Blizzard connected-realm detail to the realm slugs that share its auction house.
+// Returns null when the detail has no realm list, so the caller keeps the fallback slug.
+function connectedRealmRecord(id, detail, fallbackSlug) {
+  const slugs = (detail?.realms ?? []).map((realm) => realm?.slug).filter(Boolean);
+  if (!slugs.length) return null;
+  return { connectedRealmId: id, primarySlug: slugs[0], slugs, fallback: fallbackSlug };
+}
+
+function recordConnectedRealm(result, id, detail, fallbackSlug) {
+  const record = connectedRealmRecord(id, detail, fallbackSlug);
+  if (record) result.connectedRealms[String(id)] = record;
 }
 
 function resolveHouseName(house) {
@@ -251,6 +264,7 @@ async function harvestFactionRealms(client, unixNow, flavor, namespace) {
     try {
       const detail = await client.requestHref(realmUrl(id, "", namespace));
       slug = detail.realms?.[0]?.slug ?? slug;
+      recordConnectedRealm(result, id, detail, slug);
     } catch (error) {
       console.warn("  [" + flavor + "] " + slug + " realm details: " + describeError(error));
     }
@@ -296,6 +310,7 @@ async function harvestClassic(client, unixNow) {
     try {
       const detail = await client.wowClassic.connectedRealm(id);
       slug = detail.realms?.[0]?.slug ?? slug;
+      recordConnectedRealm(result, id, detail, slug);
     } catch (error) {
       console.warn("  [Classic] " + slug + " realm details: " + describeError(error));
     }
@@ -332,6 +347,7 @@ async function saveFlavorBlock(flavor, dateStr, hourStr, now, unixNow, result, s
     region: REGION,
     rulesets: result.partitions,
     ...(result.markets ? { markets: result.markets } : {}),
+    ...(Object.keys(result.connectedRealms ?? {}).length ? { connectedRealms: result.connectedRealms } : {}),
     stats: {
       totalItems: result.totalItems,
       totalVolume: result.totalVolume,
@@ -429,4 +445,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { harvest, harvestFactionRealms, aggregateAuctionListings, pruneOldBlocks };
+module.exports = { harvest, harvestFactionRealms, aggregateAuctionListings, pruneOldBlocks, connectedRealmRecord };

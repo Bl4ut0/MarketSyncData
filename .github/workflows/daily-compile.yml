@@ -68,7 +68,7 @@ jobs:
             Compiled 90-day rolling auction house & commodity pricing packs for all supported World of Warcraft versions.
             Each release archive contains **strictly its own flavor's dataset** trimmed to the latest 90 days (while full hourly snapshots remain archived in GitHub under `datasets/`):
             
-            - `MSData-Forever-${{ steps.vars.outputs.iso_date }}.zip` — **WoW: Forever** (Interface `16001` — PvP, Normal, RP, RP-PvP)
+            - Forever packs are released separately as one archive per ruleset and faction (`MarketSyncData_Forever_<ruleset>_<faction>`), built by the Forever data packs workflow.
             - `MSData-Anniversary-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Anniversary** (`dreamscythe`, `nightslayer`, `maladath`)
             - `MSData-ClassicEra-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Era / SoD / Hardcore** (Interface `11509`, `11508`)
             - `MSData-Classic-${{ steps.vars.outputs.iso_date }}.zip` — **Classic Progression** (Interface `50503`, `38000`, `20506`, `20505`)
@@ -77,7 +77,6 @@ jobs:
             ### Installation:
             Download the archive matching your game version and extract the `MarketSyncData` folder into your client's `Interface/AddOns/` directory alongside `MarketSync`.
           files: |
-            dist/MSData-Forever-${{ steps.vars.outputs.iso_date }}.zip
             dist/MSData-Anniversary-${{ steps.vars.outputs.iso_date }}.zip
             dist/MSData-ClassicEra-${{ steps.vars.outputs.iso_date }}.zip
             dist/MSData-Classic-${{ steps.vars.outputs.iso_date }}.zip
@@ -120,6 +119,8 @@ jobs:
 
           while IFS= read -r plan; do
             label=$(jq -r '.label' <<< "$plan")
+            # Forever has its own per-pack projects (forever-packs workflow); skip it here.
+            if [ "$label" = "Forever" ]; then continue; fi
             archive="dist/MSData-$label-$RELEASE_DATE.zip"
             test -s "$archive"
             metadata=$(jq -cn --arg label "$label" --arg date "$RELEASE_DATE" \

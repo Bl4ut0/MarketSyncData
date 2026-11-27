@@ -169,13 +169,19 @@ async function runTests() {
   console.log('Testing multi-flavor zip packager...');
   const expectedDate = new Date().toISOString().slice(0, 10);
   const zips = packageAll(expectedDate);
-  assert.strictEqual(zips.length, 5);
-  for (const label of ['Forever', 'Anniversary', 'ClassicEra', 'Classic', 'Retail']) {
+  // Forever ships one archive per pack, so it is checked separately from the single-archive flavors.
+  const foreverPacks = zips.filter((z) => path.basename(z).startsWith('MarketSyncData_Forever_'));
+  // The simulated harvest uses a non-live ruleset, so this run may produce no Forever packs.
+  assert.strictEqual(zips.length, foreverPacks.length + 4, 'one archive per Forever pack plus four other flavors');
+  for (const label of ['Anniversary', 'ClassicEra', 'Classic', 'Retail']) {
     const expectedPath = path.join(TEST_BUILD_DIR, `MSData-${label}-${expectedDate}.zip`);
     assert.ok(zips.includes(expectedPath), `Expected zip in outputs: ${expectedPath}`);
     assert.ok(fs.existsSync(expectedPath) && fs.statSync(expectedPath).size > 0, `Missing or empty zip: ${expectedPath}`);
   }
-  console.log(`  [PASS] Packager built all 5 MSData-<Flavor>-${expectedDate}.zip archives.`);
+  for (const zip of foreverPacks) {
+    assert.ok(fs.statSync(zip).size > 0, `Empty pack zip: ${zip}`);
+  }
+  console.log(`  [PASS] Packager built ${foreverPacks.length} Forever pack archives and 4 flavor archives.`);
 
   console.log('\nAll multi-flavor pipeline integration tests passed successfully!\n');
 }

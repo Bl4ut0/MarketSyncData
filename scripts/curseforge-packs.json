@@ -1,0 +1,47 @@
+{
+  "$comment": "One CurseForge project per Forever data pack. Fill curseforgeProjectId after the project is created on CurseForge, and gameVersionIds with the Forever (16001) game version ID from the CurseForge versions API. The upload job skips any pack whose project ID or game version IDs are still null.",
+  "game": "wow",
+  "gameVersionIds": null,
+  "projects": [
+    {
+      "pack": "MarketSyncData_Forever_normal_Alliance",
+      "displayName": "MarketSync Data: Forever Normal (Alliance)",
+      "curseforgeProjectId": 1832294
+    },
+    {
+      "pack": "MarketSyncData_Forever_normal_Horde",
+      "displayName": "MarketSync Data: Forever Normal (Horde)",
+      "curseforgeProjectId": 1832302
+    },
+    {
+      "pack": "MarketSyncData_Forever_pvp_Alliance",
+      "displayName": "MarketSync Data: Forever PvP (Alliance)",
+      "curseforgeProjectId": 1832304
+    },
+    {
+      "pack": "MarketSyncData_Forever_pvp_Horde",
+      "displayName": "MarketSync Data: Forever PvP (Horde)",
+      "curseforgeProjectId": 1832307
+    },
+    {
+      "pack": "MarketSyncData_Forever_roleplay_Alliance",
+      "displayName": "MarketSync Data: Forever Roleplay (Alliance)",
+      "curseforgeProjectId": 1832308
+    },
+    {
+      "pack": "MarketSyncData_Forever_roleplay_Horde",
+      "displayName": "MarketSync Data: Forever Roleplay (Horde)",
+      "curseforgeProjectId": 1832309
+    },
+    {
+      "pack": "MarketSyncData_Forever_roleplaypvp_Alliance",
+      "displayName": "MarketSync Data: Forever RP-PvP (Alliance)",
+      "curseforgeProjectId": 1832315
+    },
+    {
+      "pack": "MarketSyncData_Forever_roleplaypvp_Horde",
+      "displayName": "MarketSync Data: Forever RP-PvP (Horde)",
+      "curseforgeProjectId": 1832316
+    }
+  ]
+}
