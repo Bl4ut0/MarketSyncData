@@ -5574,17 +5574,17 @@
       "date": "2026-11-27",
       "hour": "18",
       "path": "datasets/forever/2026-11-27/18-00.json",
-      "items": 97471,
-      "volume": 11533110,
-      "timestamp": 1795802778,
+      "items": 98890,
+      "volume": 11844022,
+      "timestamp": 1795805619,
       "simulated": false,
       "analytics": {
-        "revision": "03bb3b7fa1ded11639073a66",
+        "revision": "10898017695b193da79c3017",
         "partitions": [
           {
             "key": "pvp",
             "label": "PvP",
-            "entryCount": 33110,
+            "entryCount": 33533,
             "factions": [
               "Alliance",
               "Horde",
@@ -5594,7 +5594,7 @@
           {
             "key": "roleplaypvp",
             "label": "Roleplay PvP",
-            "entryCount": 16665,
+            "entryCount": 16919,
             "factions": [
               "Alliance",
               "Horde",
@@ -5604,7 +5604,7 @@
           {
             "key": "roleplay",
             "label": "Roleplay",
-            "entryCount": 15072,
+            "entryCount": 15364,
             "factions": [
               "Alliance",
               "Horde",
@@ -5614,7 +5614,7 @@
           {
             "key": "normal",
             "label": "Normal",
-            "entryCount": 32624,
+            "entryCount": 33074,
             "factions": [
               "Alliance",
               "Horde",
@@ -5629,17 +5629,17 @@
       "date": "2026-11-27",
       "hour": "18",
       "path": "datasets/classic/2026-11-27/18-00.json",
-      "items": 6887,
-      "volume": 17357,
-      "timestamp": 1795802778,
+      "items": 6693,
+      "volume": 16805,
+      "timestamp": 1795805619,
       "simulated": false,
       "analytics": {
-        "revision": "249e13d61f5884ad220476d3",
+        "revision": "d90a22cacfd26e101ce15416",
         "partitions": [
           {
             "key": "atiesh",
             "label": "Atiesh",
-            "entryCount": 770,
+            "entryCount": 779,
             "factions": [
               "CrossFaction"
             ]
@@ -5667,15 +5667,13 @@
           {
             "key": "mankrik",
             "label": "Mankrik",
-            "entryCount": 179,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "pagle",
             "label": "Pagle",
-            "entryCount": 5300,
+            "entryCount": 5372,
             "factions": [
               "CrossFaction"
             ]
@@ -5683,7 +5681,7 @@
           {
             "key": "ashkandi",
             "label": "Ashkandi",
-            "entryCount": 12,
+            "entryCount": 1,
             "factions": [
               "CrossFaction"
             ]
@@ -5709,15 +5707,13 @@
           {
             "key": "grobbulus",
             "label": "Grobbulus",
-            "entryCount": 85,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "bloodsail-buccaneers",
             "label": "Bloodsail Buccaneers",
-            "entryCount": 202,
+            "entryCount": 229,
             "factions": [
               "CrossFaction"
             ]
@@ -5725,15 +5721,13 @@
           {
             "key": "remulos-au",
             "label": "Remulos (AU)",
-            "entryCount": 23,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "arugal-au",
             "label": "Arugal (AU)",
-            "entryCount": 305,
+            "entryCount": 308,
             "factions": [
               "CrossFaction"
             ]
@@ -5759,10 +5753,8 @@
           {
             "key": "windseeker",
             "label": "Windseeker",
-            "entryCount": 7,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "benediction",
@@ -5802,17 +5794,17 @@
       "date": "2026-11-27",
       "hour": "18",
       "path": "datasets/retail/2026-11-27/18-00.json",
-      "items": 9518,
-      "volume": 37390584,
-      "timestamp": 1795802778,
+      "items": 9535,
+      "volume": 37288678,
+      "timestamp": 1795805619,
       "simulated": false,
       "analytics": {
-        "revision": "fa7e2364d175c0ce23e2aeda",
+        "revision": "5767bcfeebe6c7cc76134394",
         "partitions": [
           {
             "key": "region",
             "label": "Region-Wide",
-            "entryCount": 9518,
+            "entryCount": 9535,
             "factions": [
               "Commodities"
             ]
@@ -5821,5 +5813,5 @@
       }
     }
   ],
-  "lastUpdated": "2026-11-27T18:06:18.973Z"
+  "lastUpdated": "2026-11-27T18:53:39.866Z"
 }
