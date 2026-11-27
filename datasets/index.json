@@ -4744,17 +4744,17 @@
       "date": "2026-11-27",
       "hour": "00",
       "path": "datasets/forever/2026-11-27/00-00.json",
-      "items": 100667,
-      "volume": 12366945,
-      "timestamp": 1795737958,
+      "items": 100538,
+      "volume": 12281228,
+      "timestamp": 1795739554,
       "simulated": false,
       "analytics": {
-        "revision": "7a407b683b4b41d5bb3c34da",
+        "revision": "17576da02463da27c0f808ef",
         "partitions": [
           {
             "key": "pvp",
             "label": "PvP",
-            "entryCount": 33854,
+            "entryCount": 33932,
             "factions": [
               "Alliance",
               "Horde",
@@ -4764,7 +4764,7 @@
           {
             "key": "roleplaypvp",
             "label": "Roleplay PvP",
-            "entryCount": 17415,
+            "entryCount": 17311,
             "factions": [
               "Alliance",
               "Horde",
@@ -4774,7 +4774,7 @@
           {
             "key": "roleplay",
             "label": "Roleplay",
-            "entryCount": 15861,
+            "entryCount": 15827,
             "factions": [
               "Alliance",
               "Horde",
@@ -4784,7 +4784,7 @@
           {
             "key": "normal",
             "label": "Normal",
-            "entryCount": 33537,
+            "entryCount": 33468,
             "factions": [
               "Alliance",
               "Horde",
@@ -4801,10 +4801,10 @@
       "path": "datasets/anniversary/2026-11-27/00-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795737958,
+      "timestamp": 1795739554,
       "simulated": false,
       "analytics": {
-        "revision": "6423219f71b4e7411431ac26",
+        "revision": "326a975ea5cf08e416fdfd5c",
         "partitions": [
           {
             "key": "dreamscythe",
@@ -4834,10 +4834,10 @@
       "path": "datasets/classicEra/2026-11-27/00-00.json",
       "items": 0,
       "volume": 0,
-      "timestamp": 1795737958,
+      "timestamp": 1795739554,
       "simulated": false,
       "analytics": {
-        "revision": "56957904a49baef6ba316490",
+        "revision": "2dfb22d10f84232d45c46e61",
         "partitions": [
           {
             "key": "remulos",
@@ -4985,17 +4985,17 @@
       "date": "2026-11-27",
       "hour": "00",
       "path": "datasets/classic/2026-11-27/00-00.json",
-      "items": 6990,
-      "volume": 17809,
-      "timestamp": 1795737958,
+      "items": 7269,
+      "volume": 18520,
+      "timestamp": 1795739554,
       "simulated": false,
       "analytics": {
-        "revision": "c3eef79d3f1b77a9a4aad714",
+        "revision": "89935bb3ee86337143856bf9",
         "partitions": [
           {
             "key": "atiesh",
             "label": "Atiesh",
-            "entryCount": 780,
+            "entryCount": 784,
             "factions": [
               "CrossFaction"
             ]
@@ -5015,10 +5015,8 @@
           {
             "key": "azuresong",
             "label": "Azuresong",
-            "entryCount": 8,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "mankrik",
@@ -5029,7 +5027,7 @@
           {
             "key": "pagle",
             "label": "Pagle",
-            "entryCount": 5285,
+            "entryCount": 5462,
             "factions": [
               "CrossFaction"
             ]
@@ -5037,7 +5035,7 @@
           {
             "key": "ashkandi",
             "label": "Ashkandi",
-            "entryCount": 11,
+            "entryCount": 1,
             "factions": [
               "CrossFaction"
             ]
@@ -5063,10 +5061,8 @@
           {
             "key": "grobbulus",
             "label": "Grobbulus",
-            "entryCount": 1,
-            "factions": [
-              "CrossFaction"
-            ]
+            "entryCount": 0,
+            "factions": []
           },
           {
             "key": "bloodsail-buccaneers",
@@ -5079,7 +5075,7 @@
           {
             "key": "remulos-au",
             "label": "Remulos (AU)",
-            "entryCount": 34,
+            "entryCount": 153,
             "factions": [
               "CrossFaction"
             ]
@@ -5087,7 +5083,7 @@
           {
             "key": "arugal-au",
             "label": "Arugal (AU)",
-            "entryCount": 384,
+            "entryCount": 382,
             "factions": [
               "CrossFaction"
             ]
@@ -5156,17 +5152,17 @@
       "date": "2026-11-27",
       "hour": "00",
       "path": "datasets/retail/2026-11-27/00-00.json",
-      "items": 9662,
-      "volume": 34892759,
-      "timestamp": 1795737958,
+      "items": 9672,
+      "volume": 35122445,
+      "timestamp": 1795739554,
       "simulated": false,
       "analytics": {
-        "revision": "6f099bbaa9b66a1a7071a783",
+        "revision": "f427ec108d48935a145bdadc",
         "partitions": [
           {
             "key": "region",
             "label": "Region-Wide",
-            "entryCount": 9662,
+            "entryCount": 9672,
             "factions": [
               "Commodities"
             ]
@@ -5175,5 +5171,5 @@
       }
     }
   ],
-  "lastUpdated": "2026-11-27T00:05:58.174Z"
+  "lastUpdated": "2026-11-27T00:32:34.598Z"
 }
