@@ -7,7 +7,7 @@
     "harvest": "node scripts/harvest.js",
     "compile": "node scripts/compile.js",
     "package": "node scripts/package.js",
-    "test": "node tests/test_pipeline.js && node tests/test_lua_core.js && node tests/test_connected_realms.js && node tests/test_pack_markets.js && node tests/test_pack_split.js"
+    "test": "node tests/test_pipeline.js && node tests/test_lua_core.js && node tests/test_connected_realms.js && node tests/test_pack_markets.js && node tests/test_pack_split.js && node tests/test_harvest_flavors.js"
   },
   "keywords": [
     "world-of-warcraft",

@@ -25,6 +25,15 @@ const FLAVORS = (process.env.HARVEST_FLAVORS || 'forever,anniversary,classicEra,
   .filter(Boolean);
 const RETENTION_DAYS = parseInt(process.env.RETENTION_DAYS || '90', 10);
 
+// Blizzard has no auction API for these editions yet. Their data will come
+// from player scan uploads, so the live harvest never calls the API for
+// them. Their packs are still compiled and released (empty until uploads
+// start). Set HARVEST_PLAYER_DATA_FLAVORS=1 to call the API for them anyway.
+const PLAYER_DATA_FLAVORS = new Set(['anniversary', 'classicEra']);
+function harvestsFromApi(flavor) {
+  return !PLAYER_DATA_FLAVORS.has(flavor) || process.env.HARVEST_PLAYER_DATA_FLAVORS === '1';
+}
+
 const DATASETS_DIR = process.env.DATASETS_DIR || path.join(__dirname, '../datasets');
 const INDEX_FILE = path.join(DATASETS_DIR, 'index.json');
 
@@ -411,6 +420,10 @@ async function harvest() {
 
   const results = {};
   for (const flavor of FLAVORS) {
+    if (!harvestsFromApi(flavor)) {
+      console.log(`[Harvester] ${flavor}: no Blizzard auction API; data comes from player uploads. Skipped.`);
+      continue;
+    }
     try {
       let res;
       if (flavor === 'forever') res = await harvestForever(client, unixNow);
@@ -445,4 +458,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { harvest, harvestFactionRealms, aggregateAuctionListings, pruneOldBlocks, connectedRealmRecord };
+module.exports = { harvest, harvestFactionRealms, aggregateAuctionListings, pruneOldBlocks, connectedRealmRecord, harvestsFromApi };
