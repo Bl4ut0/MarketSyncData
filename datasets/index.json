@@ -6056,10 +6056,10 @@
       "path": "datasets/forever/2026-11-28/10-00.json",
       "items": 111062,
       "volume": 13426934,
-      "timestamp": 1795860368,
+      "timestamp": 1795861024,
       "simulated": false,
       "analytics": {
-        "revision": "1ef14e6d72a2da14454f3407",
+        "revision": "39c765deaaa33cd577d5adc8",
         "partitions": [
           {
             "key": "pvp",
@@ -6109,12 +6109,12 @@
       "date": "2026-11-28",
       "hour": "10",
       "path": "datasets/classic/2026-11-28/10-00.json",
-      "items": 6144,
-      "volume": 15385,
-      "timestamp": 1795860368,
+      "items": 6205,
+      "volume": 15454,
+      "timestamp": 1795861024,
       "simulated": false,
       "analytics": {
-        "revision": "1abd0b3f39ea26d3926db5eb",
+        "revision": "4f86e93f40eb407ca3f46e8d",
         "partitions": [
           {
             "key": "atiesh",
@@ -6139,8 +6139,10 @@
           {
             "key": "azuresong",
             "label": "Azuresong",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 5,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "mankrik",
@@ -6153,7 +6155,7 @@
           {
             "key": "pagle",
             "label": "Pagle",
-            "entryCount": 4597,
+            "entryCount": 4565,
             "factions": [
               "CrossFaction"
             ]
@@ -6175,22 +6177,24 @@
           {
             "key": "whitemane",
             "label": "Whitemane",
-            "entryCount": 1,
+            "entryCount": 0,
+            "factions": []
+          },
+          {
+            "key": "faerlina",
+            "label": "Faerlina",
+            "entryCount": 69,
             "factions": [
               "CrossFaction"
             ]
           },
           {
-            "key": "faerlina",
-            "label": "Faerlina",
-            "entryCount": 0,
-            "factions": []
-          },
-          {
             "key": "grobbulus",
             "label": "Grobbulus",
-            "entryCount": 0,
-            "factions": []
+            "entryCount": 1,
+            "factions": [
+              "CrossFaction"
+            ]
           },
           {
             "key": "bloodsail-buccaneers",
@@ -6203,7 +6207,7 @@
           {
             "key": "remulos-au",
             "label": "Remulos (AU)",
-            "entryCount": 31,
+            "entryCount": 9,
             "factions": [
               "CrossFaction"
             ]
@@ -6211,7 +6215,7 @@
           {
             "key": "arugal-au",
             "label": "Arugal (AU)",
-            "entryCount": 353,
+            "entryCount": 394,
             "factions": [
               "CrossFaction"
             ]
@@ -6282,10 +6286,10 @@
       "path": "datasets/retail/2026-11-28/10-00.json",
       "items": 9507,
       "volume": 33703971,
-      "timestamp": 1795860368,
+      "timestamp": 1795861024,
       "simulated": false,
       "analytics": {
-        "revision": "f98f9205c901153ca0d3a35c",
+        "revision": "b498c858a9c8e80876b537ee",
         "partitions": [
           {
             "key": "region",
@@ -6299,5 +6303,5 @@
       }
     }
   ],
-  "lastUpdated": "2026-11-28T10:06:08.542Z"
+  "lastUpdated": "2026-11-28T10:17:04.637Z"
 }
